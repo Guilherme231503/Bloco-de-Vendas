@@ -1,161 +1,176 @@
-/* ===== ESTILO TOTALMENTE GENÉRICO (MODERN WEB / SAAS PADRÃO) ===== */
+/* ===== ESTILO XIAOMI HYPEROS 3 ===== */
+        /* A fonte Inter simula muito bem a 'Mi Sans' oficial do sistema */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            /* Pilha de fontes universal e segura para web */
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         :root {
-            /* Paleta Neutra Web (Tailwind Slate/Gray Inspired) */
-            --app-bg: #F8FAFC;
-            --app-surface: #FFFFFF;
-            --app-border: #E2E8F0;
-            --app-border-focus: #2563EB;
+            /* Paleta Xiaomi HyperOS Light */
+            --hyper-bg: #F4F5F7; /* Fundo geral do sistema */
+            --hyper-surface: #FFFFFF;
+            --hyper-surface-glass: rgba(255, 255, 255, 0.75); /* Efeito de vidro */
             
-            /* Tipografia */
-            --app-text: #0F172A;
-            --app-text-muted: #64748B;
+            --hyper-accent: #337BFF; /* Xiaomi Blue vibrante */
+            --hyper-accent-hover: #2A6CEB;
+            --hyper-accent-muted: rgba(51, 123, 255, 0.1);
             
-            /* Cor Primária Universal (Azul Corporativo) */
-            --app-primary: #2563EB;
-            --app-primary-hover: #1D4ED8;
+            --hyper-text-main: #000000;
+            --hyper-text-secondary: #8C8C8E;
             
-            --app-success: #16A34A;
-            --app-danger: #DC2626;
+            --hyper-border: rgba(0, 0, 0, 0.05); /* Bordas quase invisíveis */
+            --hyper-input-bg: #F0F1F3; /* Fundo de inputs estilo widget */
             
-            /* Arredondamento Padrão da Web */
-            --radius: 6px;
-            --radius-lg: 8px;
+            /* Curvas (Squircle-like) */
+            --radius-sm: 8px;
+            --radius-md: 14px; /* Botões e Inputs */
+            --radius-lg: 24px; /* Cartões grandes e modais */
+            --radius-pill: 999px;
             
-            /* Sombra Padrão Web */
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            /* Sombras fluidas */
+            --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.04);
+            --shadow-float: 0 20px 40px rgba(0, 0, 0, 0.08);
             
-            --sidebar-width: 260px;
-            --topbar-height: 56px;
-            --doc-border: #CBD5E1;
+            /* Animações "Alive" (Bouncy) */
+            --hyper-spring: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            --hyper-ease: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            
+            --sidebar-width: 300px;
+            --topbar-height: 64px;
+            
+            /* Bordas para o interior do papel (formulário) */
+            --doc-border: rgba(0, 0, 0, 0.1);
         }
 
         body {
-            background: var(--app-bg);
+            background: var(--hyper-bg);
             display: flex;
             height: 100vh;
             overflow: hidden;
-            color: var(--app-text);
-            font-size: 14px;
-            line-height: 1.5;
+            color: var(--hyper-text-main);
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ===== SCROLLBAR PADRÃO DA WEB ===== */
+        /* ===== SCROLLBAR HYPEROS ===== */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px; /* Super fina */
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #F1F5F9;
+            background: transparent;
         }
         ::-webkit-scrollbar-thumb {
-            background: #CBD5E1;
-            border-radius: var(--radius);
+            background-color: rgba(0, 0, 0, 0.15);
+            border-radius: var(--radius-pill);
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #94A3B8;
+            background-color: rgba(0, 0, 0, 0.25);
         }
 
-        /* ===== BARRA LATERAL (Sidebar Convencional) ===== */
+        /* ===== BARRA LATERAL (Glassmorphism Blur) ===== */
         .sidebar {
             width: var(--sidebar-width);
-            background: var(--app-surface);
-            border-right: 1px solid var(--app-border);
+            background: var(--hyper-surface-glass);
+            backdrop-filter: blur(25px); /* Efeito de vidro fortíssimo do HyperOS */
+            -webkit-backdrop-filter: blur(25px);
+            border-right: 1px solid var(--hyper-border);
             display: flex;
             flex-direction: column;
             height: 100vh;
-            transition: transform 0.2s ease-in-out;
+            transition: transform 0.3s ease;
             z-index: 1000;
         }
 
         .sidebar-header {
-            padding: 16px;
-            color: var(--app-text);
-            font-weight: 600;
-            font-size: 16px;
-            border-bottom: 1px solid var(--app-border);
+            padding: 24px 20px 16px 20px;
+            color: var(--hyper-text-main);
+            font-weight: 700;
+            font-size: 22px; /* Títulos grandes e limpos */
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .sidebar-header i {
-            font-size: 18px;
-            color: var(--app-primary);
+            font-size: 24px;
+            color: var(--hyper-accent);
         }
 
         .order-list {
             flex-grow: 1;
             overflow-y: auto;
-            padding: 12px;
+            padding: 0 12px;
         }
 
+        /* Navigation Item */
         .order-item {
-            background: var(--app-surface);
-            padding: 10px 12px;
+            background: transparent;
+            padding: 14px 16px;
             margin-bottom: 4px;
-            border: 1px solid transparent;
-            border-radius: var(--radius);
+            border: none;
+            border-radius: var(--radius-md);
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.15s ease;
-            font-size: 14px;
-            color: var(--app-text);
+            transition: var(--hyper-ease);
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--hyper-text-main);
         }
 
         .order-item:hover {
-            background: #F1F5F9;
-            color: var(--app-text);
+            background: rgba(0, 0, 0, 0.03);
+            transform: scale(0.98); /* Feedback tátil do HyperOS */
         }
 
         .order-item.active {
-            background: #EFF6FF;
-            border-color: #BFDBFE;
-            color: var(--app-primary);
-            font-weight: 500;
+            background: var(--hyper-surface);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            color: var(--hyper-accent);
         }
 
         .order-item span {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 150px;
+            max-width: 170px;
         }
 
         .order-item .fa-file-alt {
-            font-size: 14px;
-            color: var(--app-text-muted);
-            margin-right: 8px;
+            font-size: 18px;
+            color: var(--hyper-text-secondary);
+            margin-right: 14px;
+            transition: var(--hyper-ease);
         }
-
+        
         .order-item.active .fa-file-alt {
-            color: var(--app-primary);
+            color: var(--hyper-accent);
         }
 
         .delete-btn {
-            background: transparent;
+            background: var(--hyper-input-bg);
             border: none;
-            color: var(--app-text-muted);
+            color: var(--hyper-text-secondary);
             cursor: pointer;
             font-size: 14px;
-            border-radius: var(--radius);
-            padding: 4px 6px;
-            transition: all 0.15s;
+            border-radius: var(--radius-pill);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--hyper-spring);
         }
 
         .delete-btn:hover {
-            background: #FEE2E2;
-            color: var(--app-danger);
+            background: #FF3B30;
+            color: white;
+            transform: scale(1.1); /* Animação elástica ao focar no delete */
         }
 
         /* ===== ÁREA PRINCIPAL ===== */
@@ -165,140 +180,121 @@
             flex-direction: column;
             height: 100vh;
             width: calc(100% - var(--sidebar-width));
-            background: var(--app-bg);
+            background: var(--hyper-bg);
         }
 
-        /* ===== BARRA SUPERIOR (Navbar Padrão) ===== */
+        /* ===== BARRA DE FERRAMENTAS (Header Limpo) ===== */
         .topbar {
             height: var(--topbar-height);
-            background: var(--app-surface);
-            border-bottom: 1px solid var(--app-border);
+            background: transparent;
             display: flex;
             align-items: center;
-            padding: 0 24px;
-            gap: 12px;
+            padding: 0 32px;
+            gap: 16px;
             z-index: 10;
+            margin-top: 8px;
         }
 
         .topbar .brand {
-            font-weight: 600;
-            font-size: 15px;
-            color: var(--app-text);
-            margin-right: auto;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            display: none;
         }
 
         .topbar-actions {
             display: flex;
-            gap: 8px;
+            gap: 12px;
             flex-wrap: wrap;
         }
 
-        /* ===== BOTÕES GENÉRICOS (Web Standard) ===== */
+        /* ===== BOTÕES HYPEROS ===== */
         .btn {
-            height: 36px;
-            padding: 0 14px;
-            background: var(--app-surface);
-            color: var(--app-text);
-            border: 1px solid var(--app-border);
-            border-radius: var(--radius);
-            font-weight: 500;
-            font-size: 13px;
+            height: 42px;
+            padding: 0 20px;
+            background: var(--hyper-surface);
+            color: var(--hyper-text-main);
+            border: 1px solid var(--hyper-border);
+            border-radius: var(--radius-pill); /* Pílula clássica Xiaomi */
+            font-weight: 600;
+            font-size: 14px;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: var(--hyper-spring); /* Efeito elástico */
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            box-shadow: var(--shadow-sm);
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
+
+        .btn i { font-size: 16px; }
 
         .btn:hover {
-            background: #F8FAFC;
-            border-color: #CBD5E1;
+            transform: scale(1.03); /* Infla levemente */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
-
+        
         .btn:active {
-            background: #F1F5F9;
+            transform: scale(0.95); /* Afunda no clique */
         }
 
         .btn-primary {
-            background: var(--app-primary);
-            color: #FFFFFF;
-            border-color: var(--app-primary);
+            background: var(--hyper-accent);
+            color: white;
+            border: none;
         }
+        .btn-primary:hover { background: var(--hyper-accent-hover); }
 
-        .btn-primary:hover {
-            background: var(--app-primary-hover);
-            border-color: var(--app-primary-hover);
-            color: #FFFFFF;
-        }
-
-        .btn-success {
-            background: var(--app-success);
-            color: #FFFFFF;
-            border-color: var(--app-success);
-        }
-
-        .btn-success:hover {
-            background: #15803D;
-            border-color: #15803D;
-            color: #FFFFFF;
-        }
-
-        .btn-danger {
-            background: var(--app-danger);
-            color: #FFFFFF;
-            border-color: var(--app-danger);
-        }
-
-        .btn-danger:hover {
-            background: #B91C1C;
-            border-color: #B91C1C;
-            color: #FFFFFF;
-        }
+        .btn-success { background: #34C759; color: white; border: none; }
+        .btn-danger { background: #FF3B30; color: white; border: none; }
 
         .menu-toggle {
             display: none;
-            font-size: 16px;
-            padding: 6px 10px;
+            font-size: 20px;
+            background: var(--hyper-surface);
+            border: none;
+            border-radius: var(--radius-pill);
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: var(--hyper-spring);
         }
+
+        .menu-toggle:active { transform: scale(0.9); }
 
         /* ===== CONTAINER DO PAPEL ===== */
         .paper-container {
             flex-grow: 1;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 24px;
+            padding: 16px 40px 64px 40px;
             display: flex;
             justify-content: center;
             align-items: flex-start;
         }
 
-        /* ===== O PAPEL (Card Clássico com Borda Fina) ===== */
+        /* ===== O PAPEL (Cartão HyperOS) ===== */
         .page {
-            background-color: var(--app-surface);
+            background-color: var(--hyper-surface);
             width: 800px;
             min-width: 800px;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--app-border);
+            border-radius: var(--radius-lg); /* Cantos bem redondos de 24px */
+            border: 1px solid rgba(255, 255, 255, 0.4); /* Brilho sutil nas bordas */
             padding: 32px;
             display: flex;
             flex-direction: column;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-soft);
             min-height: 1000px;
         }
 
-        /* Estrutura interna em tabela clássica */
+        /* Estrutura interna: Linhas super suaves e limpas */
         .border-box {
             border: 1px solid var(--doc-border);
-            border-radius: var(--radius);
+            border-radius: var(--radius-md); 
             display: flex;
             flex-direction: column;
             flex-grow: 1;
             height: 100%;
-            background: #FFFFFF;
+            background: var(--hyper-surface);
+            overflow: hidden;
         }
 
         /* ===== CAMPOS DO FORMULÁRIO ===== */
@@ -309,10 +305,10 @@
 
         .col {
             border-right: 1px solid var(--doc-border);
-            padding: 10px 12px;
+            padding: 14px 16px;
             display: flex;
             align-items: center;
-            background: #FFFFFF;
+            background: var(--hyper-surface);
         }
 
         .col:last-child { border-right: none; }
@@ -320,71 +316,75 @@
         .label {
             font-weight: 600;
             font-size: 11px;
-            margin-right: 8px;
+            margin-right: 12px;
             text-transform: uppercase;
-            color: var(--app-text-muted);
-            letter-spacing: 0.3px;
+            color: var(--hyper-text-secondary);
+            letter-spacing: 0.5px;
         }
 
-        /* Inputs Padrão Web */
+        /* Inputs de formulário estilo Widget HyperOS */
         input[type="text"], input[type="number"] {
-            border: 1px solid transparent;
+            border: 2px solid transparent;
             outline: none;
             width: 100%;
-            font-size: 13px;
-            background: transparent;
-            color: var(--app-text);
-            padding: 4px 6px;
-            border-radius: var(--radius);
-            transition: all 0.15s ease;
+            font-size: 15px;
+            background: var(--hyper-input-bg);
+            color: var(--hyper-text-main);
+            padding: 10px 14px;
+            border-radius: 10px; /* Caixas arredondadas internas */
+            transition: var(--hyper-ease);
+            font-weight: 500;
         }
 
-        /* Anel de Foco Clássico da Web (Focus Ring) */
         input[type="text"]:focus, input[type="number"]:focus {
-            background: #FFFFFF;
-            border-color: var(--app-border-focus);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            background: var(--hyper-surface);
+            border: 2px solid var(--hyper-accent);
+            box-shadow: 0 4px 12px rgba(51, 123, 255, 0.15); /* Efeito glow no foco */
         }
 
         /* ===== CABEÇALHO DO DOCUMENTO ===== */
         .header-section {
             display: flex;
             justify-content: space-between;
-            padding: 20px;
+            padding: 24px;
             border-bottom: 1px solid var(--doc-border);
         }
 
+        /* Caixas de destaque no cabeçalho */
         .pedido-box {
-            border: 1px solid var(--doc-border);
-            padding: 10px 14px;
+            background: var(--hyper-accent-muted);
+            padding: 12px 20px;
             display: flex;
             align-items: center;
             width: 60%;
-            border-radius: var(--radius);
-            background: #F8FAFC;
+            border-radius: var(--radius-md); 
         }
 
         .pedido-box .label {
-            font-size: 14px;
-            margin-right: 12px;
-            color: var(--app-text);
-            font-weight: 600;
+            font-size: 16px;
+            margin-right: 16px;
+            color: var(--hyper-accent);
+            font-weight: 700;
+            letter-spacing: 0;
         }
 
         .pedido-box input {
-            font-size: 20px;
+            font-size: 26px;
             font-weight: 700;
-            color: var(--app-text);
+            color: var(--hyper-accent);
+            background: transparent;
+            border: none;
+            padding: 0;
+            box-shadow: none;
         }
 
         .data-box {
-            border: 1px solid var(--doc-border);
-            padding: 10px 14px;
+            background: var(--hyper-input-bg);
+            padding: 12px 16px;
             display: flex;
             align-items: center;
             width: 35%;
-            border-radius: var(--radius);
-            background: #F8FAFC;
+            border-radius: var(--radius-md);
         }
 
         .data-inputs {
@@ -397,15 +397,15 @@
         .data-inputs input {
             width: 28%;
             text-align: center;
-            font-weight: 500;
-            font-size: 14px;
-            background: #FFFFFF;
-            border: 1px solid var(--doc-border);
+            font-weight: 600;
+            font-size: 15px;
+            background: var(--hyper-surface);
+            border: 1px solid var(--hyper-border);
         }
 
         .data-inputs span {
-            font-size: 14px;
-            color: var(--app-text-muted);
+            font-size: 20px;
+            color: var(--hyper-text-secondary);
         }
 
         /* ===== TABELA DE ITENS ===== */
@@ -423,7 +423,7 @@
         th, td {
             border-right: 1px solid var(--doc-border);
             border-bottom: 1px solid var(--doc-border);
-            padding: 8px 12px;
+            padding: 10px 14px;
         }
 
         th:last-child, td:last-child { border-right: none; }
@@ -433,9 +433,10 @@
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
-            background: #F8FAFC;
-            color: var(--app-text-muted);
+            background: var(--hyper-input-bg);
+            color: var(--hyper-text-secondary);
             text-align: left;
+            letter-spacing: 0.5px;
         }
 
         .col-quant { width: 10%; text-align: center; }
@@ -451,8 +452,8 @@
         .footer-section {
             display: flex;
             justify-content: space-between;
-            padding: 20px;
-            background: #FFFFFF;
+            padding: 24px;
+            background: var(--hyper-surface);
             border-top: 1px solid var(--doc-border);
         }
 
@@ -466,47 +467,44 @@
         .footer-row {
             display: flex;
             align-items: center;
-            margin-bottom: 8px;
-            gap: 10px;
+            margin-bottom: 12px;
+            gap: 16px;
         }
 
         .footer-row input[type="text"] {
-            width: 200px;
-            border-bottom: 1px solid var(--doc-border);
-            border-radius: 0;
-            padding-left: 0;
+            width: 240px;
         }
 
-        /* Checkbox Quadrado Moderno Universal */
+        /* Checkbox estilo HyperOS (Quadrado muito arredondado) */
         input[type="checkbox"] {
             appearance: none;
-            width: 16px;
-            height: 16px;
-            border: 1px solid #CBD5E1;
-            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #D1D1D6;
+            border-radius: 8px; /* Squircle feeling */
             cursor: pointer;
-            background: #FFFFFF;
+            background: var(--hyper-surface);
             position: relative;
             flex-shrink: 0;
-            transition: all 0.15s ease;
+            transition: var(--hyper-spring);
         }
 
-        input[type="checkbox"]:hover {
-            border-color: #94A3B8;
+        input[type="checkbox"]:active {
+            transform: scale(0.85); /* Feedback de clique */
         }
 
         input[type="checkbox"]:checked {
-            background: var(--app-primary);
-            border-color: var(--app-primary);
+            background: var(--hyper-accent);
+            border-color: var(--hyper-accent);
         }
 
         input[type="checkbox"]:checked::after {
             content: '';
             position: absolute;
-            left: 5px;
-            top: 2px;
-            width: 4px;
-            height: 8px;
+            left: 7px;
+            top: 4px;
+            width: 5px;
+            height: 10px;
             border: solid white;
             border-width: 0 2px 2px 0;
             transform: rotate(45deg);
@@ -520,74 +518,89 @@
         }
 
         .total-label {
-            font-size: 16px;
+            font-size: 20px;
             font-weight: 600;
-            margin-right: 12px;
-            color: var(--app-text-muted);
+            margin-right: 16px;
+            color: var(--hyper-text-secondary);
         }
 
         .total-value {
-            width: 150px;
-            font-size: 22px;
+            width: 180px;
+            font-size: 28px;
             font-weight: 700;
             text-align: right;
-            color: var(--app-text);
-            padding: 0 4px;
+            color: var(--hyper-accent);
+            padding: 0 8px;
+            background: transparent;
+            border: none;
         }
 
-        /* ===== RESPONSIVO ===== */
+        /* ===== RESPONSIVO (Mobile App Feeling) ===== */
         @media (max-width: 768px) {
             .sidebar {
                 position: absolute;
                 left: -100%;
                 height: 100%;
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                box-shadow: 20px 0 50px rgba(0,0,0,0.1); 
             }
             .sidebar.active { left: 0; }
             .main-area { width: 100%; }
-            .topbar { padding: 0 16px; }
-            .menu-toggle { display: inline-flex; }
             
+            .topbar { padding: 12px 16px; }
+            .menu-toggle { display: flex; }
+            .topbar .brand {
+                display: flex;
+                font-weight: 700;
+                font-size: 20px;
+            }
             .paper-container { padding: 12px; }
 
             .page:not(.pdf-mode) {
                 width: 100%;
                 min-width: 100%;
                 min-height: auto;
-                padding: 16px;
+                padding: 20px;
+                border-radius: 28px; /* Mais curvo em mobile */
             }
+            
             .page:not(.pdf-mode) .border-box { border: none; }
+
             .page:not(.pdf-mode) .header-section {
                 flex-direction: column;
                 border-bottom: none;
-                gap: 12px;
+                gap: 16px;
                 padding: 0;
-                margin-bottom: 16px;
+                margin-bottom: 24px;
             }
             .page:not(.pdf-mode) .pedido-box,
-            .page:not(.pdf-mode) .data-box { width: 100%; }
+            .page:not(.pdf-mode) .data-box {
+                width: 100%;
+            }
+            
             .page:not(.pdf-mode) .flex-row {
                 flex-direction: column;
                 border-bottom: none;
-                gap: 8px;
-                margin-bottom: 8px;
+                gap: 12px;
+                margin-bottom: 12px;
             }
             .page:not(.pdf-mode) .col {
                 width: 100% !important;
-                border: 1px solid var(--app-border);
-                border-radius: var(--radius);
+                border: 1px solid var(--hyper-border);
+                border-radius: 12px;
             }
+
             .page:not(.pdf-mode) .items-section {
                 overflow-x: auto;
-                border: 1px solid var(--app-border);
-                border-radius: var(--radius);
-                margin-top: 12px;
+                border: 1px solid var(--hyper-border);
+                border-radius: 12px;
+                margin-top: 16px;
             }
             .page:not(.pdf-mode) table { min-width: 600px; }
+
             .page:not(.pdf-mode) .footer-section {
                 flex-direction: column;
-                gap: 16px;
-                padding: 16px 0 0 0;
+                gap: 24px;
+                padding: 24px 0 0 0;
                 border-top: none;
             }
             .page:not(.pdf-mode) .footer-left,
@@ -597,7 +610,7 @@
             }
         }
 
-        /* ===== PDF MODE - TOTALMENTE PRONTO PARA IMPRESSÃO A4 ===== */
+        /* ===== PDF MODE - LIMPANDO PARA IMPRESSÃO PERFEITA A4 ===== */
         .pdf-mode {
             width: 2480px !important;
             min-width: 2480px !important;
@@ -619,7 +632,7 @@
         }
 
         .pdf-mode .border-box {
-            border: 2px solid black !important;
+            border: 3px solid black !important;
             border-radius: 0 !important;
             height: auto !important;
             min-height: auto !important;
@@ -638,8 +651,8 @@
 
         .pdf-mode th {
             font-size: 18px !important;
-            border-bottom: 2px solid black !important;
-            background: #F8FAFC !important;
+            border-bottom: 3px solid black !important;
+            background: rgba(0,0,0,0.05) !important;
             color: black !important;
         }
 
@@ -650,30 +663,32 @@
             padding: 4px 0 !important;
             border-radius: 0 !important;
             color: black !important;
+            box-shadow: none !important;
         }
 
         .pdf-mode input[type="checkbox"] {
-            width: 22px !important;
-            height: 22px !important;
-            border: 2px solid black !important;
-            border-radius: 2px !important; 
+            width: 26px !important;
+            height: 26px !important;
+            border: 3px solid black !important;
+            border-radius: 0 !important; 
             background: transparent !important;
         }
         
         .pdf-mode input[type="checkbox"]:checked::after {
             border-color: black !important;
-            width: 6px !important;
-            height: 12px !important;
-            top: 1px !important;
+            width: 8px !important;
+            height: 14px !important;
+            top: 0px !important;
             left: 6px !important;
-            border-width: 0 2px 2px 0 !important;
+            border-width: 0 3px 3px 0 !important;
         }
 
         .pdf-mode .label { font-size: 16px !important; color: black !important; }
+
         .pdf-mode .pedido-box .label { font-size: 32px !important; color: black !important;}
         .pdf-mode .pedido-box input { font-size: 36px !important; color: black !important;}
         .pdf-mode .pedido-box {
-            border: 2px solid black !important;
+            border: 3px solid black !important;
             background: transparent !important;
             padding: 15px 25px !important;
             border-radius: 0 !important;
@@ -684,12 +699,10 @@
             font-size: 24px !important;
             border-bottom: 2px solid black !important;
             width: 25% !important;
-            background: transparent !important;
-            border-radius: 0 !important;
         }
         .pdf-mode .data-inputs span { font-size: 28px !important; color: black !important; }
         .pdf-mode .data-box {
-            border: 2px solid black !important;
+            border: 3px solid black !important;
             background: transparent !important;
             padding: 15px 20px !important;
             border-radius: 0 !important;
@@ -701,13 +714,13 @@
             width: 220px !important;
             min-height: 45px !important;
             color: black !important;
-            border-bottom: 2px solid black !important;
+            border-bottom: 3px solid black !important;
         }
 
         .pdf-mode .flex-row { border-bottom: 2px solid black !important; }
         .pdf-mode .col { border-right: 2px solid black !important; padding: 12px 20px !important; }
         .pdf-mode .footer-section {
-            border-top: 2px solid black !important;
+            border-top: 3px solid black !important;
             padding: 25px !important;
             background: white !important;
         }
@@ -717,17 +730,19 @@
             font-size: 20px !important;
         }
         .pdf-mode .header-section {
-            border-bottom: 2px solid black !important;
+            border-bottom: 3px solid black !important;
             padding: 25px !important;
             background: white !important;
         }
 
-        /* ===== LOADING (Modal Simples Padrão) ===== */
+        /* ===== LOADING (Blur HyperOS) ===== */
         .loading-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.4); /* Backdrop escurecido clássico */
+            background: rgba(0, 0, 0, 0.2); 
+            backdrop-filter: blur(15px); /* Efeito de vidro por cima de tudo */
+            -webkit-backdrop-filter: blur(15px);
             z-index: 9999;
             justify-content: center;
             align-items: center;
@@ -735,24 +750,24 @@
         }
         .loading-overlay.active { display: flex; }
         .loading-box {
-            background: var(--app-surface);
-            padding: 24px 36px;
-            border-radius: var(--radius-lg);
+            background: var(--hyper-surface-glass);
+            padding: 40px 50px;
+            border-radius: var(--radius-lg); 
             text-align: center;
-            min-width: 180px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--app-border);
+            min-width: 260px;
+            box-shadow: var(--shadow-float);
+            border: 1px solid rgba(255,255,255,0.4);
         }
         .loading-box i {
-            font-size: 32px;
-            color: var(--app-primary);
-            animation: spin 0.8s linear infinite;
+            font-size: 48px;
+            color: var(--hyper-accent);
+            animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
         }
         .loading-box .loading-text {
-            margin-top: 12px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--app-text);
+            margin-top: 24px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--hyper-text-main);
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }

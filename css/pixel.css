@@ -1,0 +1,798 @@
+/* ===== ESTILO MATERIAL YOU (Google Pixel / MD3) ===== */
+        /* Fonte Outfit traz o aspecto geométrico e "expressivo" do Google Sans moderno */
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700&family=Roboto:wght@400;500&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', 'Roboto', sans-serif;
+        }
+
+        :root {
+            /* Paleta Material Design 3 (Expressive Indigo/Warm Theme) */
+            --md-sys-color-background: #FFFBFE;
+            --md-sys-color-surface: #FDF8F5; /* Fundo quente e suave */
+            --md-sys-color-surface-container: #F4ECE7;
+            --md-sys-color-surface-container-high: #E8E0DA;
+            
+            --md-sys-color-primary: #6750A4;
+            --md-sys-color-on-primary: #FFFFFF;
+            --md-sys-color-primary-container: #EADDFF;
+            --md-sys-color-on-primary-container: #21005D;
+            
+            --md-sys-color-secondary-container: #E8DEF8;
+            --md-sys-color-on-secondary-container: #1D192B;
+            
+            --md-sys-color-error: #B3261E;
+            --md-sys-color-on-error: #FFFFFF;
+            
+            --md-sys-color-on-surface: #1C1B1F;
+            --md-sys-color-on-surface-variant: #49454F;
+            --md-sys-color-outline: #79747E;
+            
+            /* Curvas padrão do Google */
+            --md-sys-shape-corner-extra-large: 28px; /* Cartões grandes */
+            --md-sys-shape-corner-full: 100px; /* Pílulas */
+            
+            /* Sombra MD3 (Elevation 1 & 3) */
+            --md-elevation-1: 0px 1px 2px 0px rgba(0,0,0,0.3), 0px 1px 3px 1px rgba(0,0,0,0.15);
+            --md-elevation-3: 0px 1px 3px 0px rgba(0,0,0,0.3), 0px 4px 8px 3px rgba(0,0,0,0.15);
+            
+            /* Curva de animação padrão do Material */
+            --md-transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+            
+            --sidebar-width: 320px;
+            --topbar-height: 64px;
+            
+            /* Bordas para o interior do papel (manter aspecto de formulário) */
+            --doc-border: #49454F;
+        }
+
+        body {
+            background: var(--md-sys-color-surface);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            color: var(--md-sys-color-on-surface);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== SCROLLBAR MATERIAL ===== */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--md-sys-color-outline);
+            border: 3px solid var(--md-sys-color-surface);
+            border-radius: var(--md-sys-shape-corner-full);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--md-sys-color-on-surface-variant);
+        }
+
+        /* ===== BARRA LATERAL (Navigation Drawer) ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--md-sys-color-surface);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+            z-index: 1000;
+            padding: 12px;
+            /* Material 3 não usa borda para separar drawer se estiver no mesmo nível, 
+               mas vamos usar o surface-container para dar distinção de tom */
+            background: var(--md-sys-color-surface-container);
+            border-top-right-radius: 16px;
+            border-bottom-right-radius: 16px;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            color: var(--md-sys-color-on-surface);
+            font-weight: 700;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+
+        .sidebar-header i {
+            font-size: 24px;
+            color: var(--md-sys-color-primary);
+        }
+
+        .order-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0 12px;
+        }
+
+        /* Navigation Drawer Item (Pílula) */
+        .order-item {
+            background: transparent;
+            padding: 0 16px;
+            height: 56px; /* Altura padrão MD3 */
+            margin-bottom: 4px;
+            border: none;
+            border-radius: var(--md-sys-shape-corner-full);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--md-transition);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        .order-item:hover {
+            background: rgba(28, 27, 31, 0.08); /* State layer */
+        }
+
+        .order-item.active {
+            background: var(--md-sys-color-primary-container);
+            color: var(--md-sys-color-on-primary-container);
+        }
+
+        .order-item span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 170px;
+            transition: color 0.2s;
+        }
+
+        .order-item .fa-file-alt {
+            font-size: 20px;
+            margin-right: 16px;
+        }
+        
+        .order-item.active .fa-file-alt {
+            color: var(--md-sys-color-on-primary-container);
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: var(--md-sys-color-on-surface-variant);
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--md-transition);
+        }
+
+        .delete-btn:hover {
+            background: rgba(179, 38, 30, 0.12); /* Erro state layer */
+            color: var(--md-sys-color-error);
+        }
+
+        /* ===== ÁREA PRINCIPAL ===== */
+        .main-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: calc(100% - var(--sidebar-width));
+            background: var(--md-sys-color-surface);
+        }
+
+        /* ===== BARRA DE FERRAMENTAS (Top App Bar) ===== */
+        .topbar {
+            height: var(--topbar-height);
+            background: var(--md-sys-color-surface);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 16px;
+            z-index: 10;
+        }
+
+        .topbar .brand {
+            display: none;
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== BOTÕES MATERIAL YOU (Filled, Tonal, etc) ===== */
+        .btn {
+            height: 40px;
+            padding: 0 24px;
+            background: var(--md-sys-color-secondary-container); /* Tonal Button */
+            color: var(--md-sys-color-on-secondary-container);
+            border: none;
+            border-radius: var(--md-sys-shape-corner-full); /* Pílula perfeita */
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--md-transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Roboto', sans-serif; /* Botões no MD3 costumam usar Roboto */
+        }
+
+        .btn i { font-size: 18px; }
+
+        .btn:hover {
+            box-shadow: var(--md-elevation-1);
+            background: #DFD3ED; /* Simulated hover state layer */
+        }
+        
+        .btn:active {
+            box-shadow: none;
+        }
+
+        .btn-primary {
+            background: var(--md-sys-color-primary);
+            color: var(--md-sys-color-on-primary);
+        }
+        .btn-primary:hover { 
+            background: #735Baf; /* Levemente mais claro/estado hover */
+            box-shadow: var(--md-elevation-1);
+        }
+
+        .btn-success {
+            background: #146C2E; /* Verde Material */
+            color: white;
+        }
+        .btn-success:hover { background: #0F5223; box-shadow: var(--md-elevation-1); }
+
+        .btn-danger {
+            background: var(--md-sys-color-error);
+            color: var(--md-sys-color-on-error);
+        }
+        .btn-danger:hover { background: #8C1D18; box-shadow: var(--md-elevation-1); }
+
+        .menu-toggle {
+            display: none;
+            font-size: 24px;
+            padding: 0;
+            background: transparent;
+            color: var(--md-sys-color-on-surface);
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            align-items: center;
+            justify-content: center;
+            transition: var(--md-transition);
+        }
+
+        .menu-toggle:hover {
+            background: rgba(28, 27, 31, 0.08);
+        }
+
+        /* ===== CONTAINER DO PAPEL ===== */
+        .paper-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 16px 32px 64px 32px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* ===== O PAPEL (Material Card com grande arredondamento) ===== */
+        .page {
+            background-color: var(--md-sys-color-background);
+            width: 800px;
+            min-width: 800px;
+            border-radius: var(--md-sys-shape-corner-extra-large); /* 28px nativo do Pixel */
+            border: none;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--md-elevation-1); /* Sombra difusa MD3 */
+            min-height: 1000px;
+        }
+
+        /* Área interna do documento - Mantendo aspecto de tabela estruturada */
+        .border-box {
+            border: 1px solid var(--md-sys-color-outline);
+            border-radius: 12px; 
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            height: 100%;
+            background: #ffffff;
+            overflow: hidden;
+        }
+
+        /* ===== CAMPOS DO FORMULÁRIO (TextFields) ===== */
+        .flex-row {
+            display: flex;
+            border-bottom: 1px solid var(--md-sys-color-outline);
+        }
+
+        .col {
+            border-right: 1px solid var(--md-sys-color-outline);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+        }
+
+        .col:last-child { border-right: none; }
+
+        .label {
+            font-weight: 500;
+            font-size: 12px;
+            margin-right: 12px;
+            white-space: nowrap;
+            text-transform: uppercase;
+            color: var(--md-sys-color-on-surface-variant);
+            letter-spacing: 0.5px;
+        }
+
+        /* MD3 Filled Text Field Simulation */
+        input[type="text"], input[type="number"] {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 16px;
+            background: transparent;
+            color: var(--md-sys-color-on-surface);
+            padding: 8px 12px;
+            border-bottom: 1px solid transparent;
+            border-radius: 4px 4px 0 0;
+            transition: var(--md-transition);
+            font-family: 'Roboto', sans-serif;
+        }
+
+        input[type="text"]:hover, input[type="number"]:hover {
+            background: var(--md-sys-color-surface-container);
+            border-bottom: 1px solid var(--md-sys-color-on-surface);
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            background: var(--md-sys-color-surface-container-high);
+            border-bottom: 2px solid var(--md-sys-color-primary);
+        }
+
+        /* ===== CABEÇALHO DO DOCUMENTO ===== */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            padding: 24px;
+            border-bottom: 1px solid var(--md-sys-color-outline);
+            background: var(--md-sys-color-background);
+        }
+
+        .pedido-box {
+            border: 2px solid var(--md-sys-color-primary);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            width: 60%;
+            border-radius: 12px; 
+            background: var(--md-sys-color-primary-container);
+        }
+
+        .pedido-box .label {
+            font-size: 18px;
+            margin-right: 16px;
+            color: var(--md-sys-color-on-primary-container);
+            font-weight: 700;
+        }
+
+        .pedido-box input {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--md-sys-color-on-primary-container);
+        }
+        
+        .pedido-box input:hover, .pedido-box input:focus {
+            background: transparent;
+            border-bottom: 2px solid var(--md-sys-color-primary);
+        }
+
+        .data-box {
+            border: 1px solid var(--md-sys-color-outline);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            width: 35%;
+            border-radius: 12px;
+        }
+
+        .data-inputs {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            width: 100%;
+        }
+
+        .data-inputs input {
+            width: 28%;
+            text-align: center;
+            font-weight: 500;
+            font-size: 16px;
+            border-radius: 4px 4px 0 0; 
+            border-bottom: 1px solid var(--md-sys-color-outline);
+        }
+
+        .data-inputs span {
+            font-size: 20px;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        /* ===== TABELA DE ITENS ===== */
+        .items-section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border-right: 1px solid var(--md-sys-color-outline);
+            border-bottom: 1px solid var(--md-sys-color-outline);
+            padding: 8px 12px;
+        }
+
+        th:last-child, td:last-child { border-right: none; }
+        tr:last-child td { border-bottom: 1px solid var(--md-sys-color-outline); }
+
+        th {
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            background: var(--md-sys-color-surface-container);
+            color: var(--md-sys-color-on-surface);
+            text-align: left;
+        }
+
+        .col-quant { width: 10%; text-align: center; }
+        .col-desc { width: 60%; }
+        .col-preco { width: 15%; text-align: center; }
+        .col-total { width: 15%; text-align: center; }
+
+        td th.col-quant, td th.col-preco, td th.col-total { text-align: center; }
+
+        td input { text-align: center; }
+        td.col-desc input { text-align: left; }
+
+        /* ===== RODAPÉ ===== */
+        .footer-section {
+            display: flex;
+            justify-content: space-between;
+            padding: 24px;
+            background: var(--md-sys-color-background);
+            border-top: 1px solid var(--md-sys-color-outline);
+        }
+
+        .footer-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 60%;
+        }
+
+        .footer-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 16px;
+        }
+
+        .footer-row input[type="text"] {
+            border-bottom: 1px solid var(--md-sys-color-outline);
+            width: 220px;
+        }
+
+        /* Checkbox Material 3 */
+        input[type="checkbox"] {
+            margin: 0 8px;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--md-sys-color-on-surface-variant);
+            border-radius: 2px; /* Checkboxes no MD são levemente arredondados */
+            cursor: pointer;
+            background: transparent;
+            position: relative;
+            flex-shrink: 0;
+            transition: var(--md-transition);
+        }
+
+        input[type="checkbox"]:checked {
+            background: var(--md-sys-color-primary);
+            border-color: var(--md-sys-color-primary);
+        }
+
+        input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 2px;
+            width: 4px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .footer-right {
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            width: 40%;
+        }
+
+        .total-label {
+            font-size: 20px;
+            font-weight: 500;
+            margin-right: 16px;
+            color: var(--md-sys-color-on-surface-variant);
+        }
+
+        .total-value {
+            width: 160px;
+            font-size: 28px;
+            font-weight: 700;
+            text-align: right;
+            color: var(--md-sys-color-primary);
+            padding: 0 8px;
+            border-bottom: 2px solid var(--md-sys-color-primary);
+        }
+
+        /* ===== RESPONSIVO (Material Bottom Sheet Feel) ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                left: -100%;
+                height: 100%;
+                border-radius: 0 28px 28px 0; /* Gaveta arredondada do Android */
+                box-shadow: var(--md-elevation-3); 
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .main-area { width: 100%; }
+            
+            .topbar {
+                padding: 8px 16px;
+            }
+            .menu-toggle { display: flex; }
+            .topbar .brand {
+                display: flex;
+                font-weight: 700;
+                font-size: 18px;
+            }
+            .paper-container { padding: 8px; }
+
+            .page:not(.pdf-mode) {
+                width: 100%;
+                min-width: 100%;
+                min-height: auto;
+                padding: 16px;
+                border-radius: 24px;
+            }
+            
+            .page:not(.pdf-mode) .border-box { border: none; }
+
+            .page:not(.pdf-mode) .header-section {
+                flex-direction: column;
+                border-bottom: none;
+                gap: 16px;
+                padding: 0;
+                margin-bottom: 24px;
+            }
+            .page:not(.pdf-mode) .pedido-box,
+            .page:not(.pdf-mode) .data-box {
+                width: 100%;
+            }
+            
+            .page:not(.pdf-mode) .flex-row {
+                flex-direction: column;
+                border-bottom: none;
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+            .page:not(.pdf-mode) .col {
+                width: 100% !important;
+                border: 1px solid var(--md-sys-color-outline);
+                border-radius: 8px;
+            }
+
+            .page:not(.pdf-mode) .items-section {
+                overflow-x: auto;
+                border: 1px solid var(--md-sys-color-outline);
+                border-radius: 8px;
+                margin-top: 16px;
+            }
+            .page:not(.pdf-mode) table { min-width: 600px; }
+
+            .page:not(.pdf-mode) .footer-section {
+                flex-direction: column;
+                gap: 24px;
+                padding: 24px 0 0 0;
+                border-top: none;
+            }
+            .page:not(.pdf-mode) .footer-left,
+            .page:not(.pdf-mode) .footer-right {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
+        /* ===== PDF MODE - LIMPANDO CORES MATERIAL PARA A4 ===== */
+        .pdf-mode {
+            width: 2480px !important;
+            min-width: 2480px !important;
+            max-width: 2480px !important;
+            padding: 40px !important;
+            border: none !important;
+            background: white !important;
+            margin: 0 auto !important;
+            box-shadow: none !important;
+            border-radius: 0 !important; 
+            min-height: 3508px !important;
+            height: auto !important;
+            overflow: visible !important;
+            display: block !important;
+            position: relative !important;
+            transform: none !important;
+            font-size: 16px !important;
+            line-height: 1.6 !important;
+        }
+
+        .pdf-mode .border-box {
+            border: 3px solid black !important;
+            border-radius: 0 !important;
+            height: auto !important;
+            min-height: auto !important;
+            padding: 20px !important;
+        }
+
+        .pdf-mode .items-section { overflow: visible !important; }
+        .pdf-mode table { width: 100% !important; table-layout: fixed !important; }
+
+        .pdf-mode th, .pdf-mode td {
+            padding: 16px !important;
+            font-size: 18px !important;
+            border-right: 2px solid black !important;
+            border-bottom: 2px solid black !important;
+        }
+
+        .pdf-mode th {
+            font-size: 18px !important;
+            border-bottom: 3px solid black !important;
+            background: rgba(0,0,0,0.05) !important;
+            color: black !important;
+        }
+
+        .pdf-mode input {
+            font-size: 18px !important;
+            border: none !important;
+            background: transparent !important;
+            padding: 4px 0 !important;
+            border-radius: 0 !important;
+            color: black !important;
+        }
+
+        .pdf-mode input[type="checkbox"] {
+            width: 24px !important;
+            height: 24px !important;
+            border: 3px solid black !important;
+            border-radius: 0 !important; 
+            background: transparent !important;
+        }
+        
+        .pdf-mode input[type="checkbox"]:checked::after {
+            border-color: black !important;
+            width: 6px !important;
+            height: 12px !important;
+            top: 1px !important;
+            left: 5px !important;
+        }
+
+        .pdf-mode .label { font-size: 16px !important; color: black !important; }
+
+        .pdf-mode .pedido-box .label { font-size: 32px !important; color: black !important;}
+        .pdf-mode .pedido-box input { font-size: 36px !important; color: black !important;}
+        .pdf-mode .pedido-box {
+            border: 3px solid black !important;
+            background: transparent !important;
+            padding: 15px 25px !important;
+            border-radius: 0 !important;
+        }
+
+        .pdf-mode .data-box .label { font-size: 18px !important; }
+        .pdf-mode .data-inputs input {
+            font-size: 24px !important;
+            border-bottom: 2px solid black !important;
+            width: 25% !important;
+        }
+        .pdf-mode .data-inputs span { font-size: 28px !important; color: black !important; }
+        .pdf-mode .data-box {
+            border: 3px solid black !important;
+            padding: 15px 20px !important;
+            border-radius: 0 !important;
+        }
+
+        .pdf-mode .total-label { font-size: 32px !important; color: black !important;}
+        .pdf-mode .total-value {
+            font-size: 36px !important;
+            width: 220px !important;
+            min-height: 45px !important;
+            color: black !important;
+            border-bottom: 3px solid black !important;
+        }
+
+        .pdf-mode .flex-row { border-bottom: 2px solid black !important; }
+        .pdf-mode .col { border-right: 2px solid black !important; padding: 12px 20px !important; }
+        .pdf-mode .footer-section {
+            border-top: 3px solid black !important;
+            padding: 25px !important;
+            background: white !important;
+        }
+        .pdf-mode .footer-row input[type="text"] {
+            border-bottom: 2px solid black !important;
+            width: 200px !important;
+            font-size: 20px !important;
+        }
+        .pdf-mode .header-section {
+            border-bottom: 3px solid black !important;
+            padding: 25px !important;
+            background: white !important;
+        }
+
+        /* ===== LOADING (Material 3 Dialog) ===== */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.32); /* Scrim padrão MD3 */
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .loading-overlay.active {
+            display: flex;
+        }
+        .loading-box {
+            background: var(--md-sys-color-surface-container-high);
+            padding: 32px 48px;
+            border-radius: var(--md-sys-shape-corner-extra-large); /* 28px */
+            text-align: center;
+            min-width: 280px;
+            box-shadow: var(--md-elevation-3);
+        }
+        .loading-box i {
+            font-size: 48px;
+            color: var(--md-sys-color-primary);
+            animation: spin 1s cubic-bezier(0.2, 0, 0, 1) infinite;
+        }
+        .loading-box .loading-text {
+            margin-top: 24px;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--md-sys-color-on-surface);
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }

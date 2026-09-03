@@ -1,0 +1,837 @@
+/* ===== ESTILO WINDOWS 11 (Fluent Design) ===== */
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            /* Paleta Windows 11 Light Mode */
+            --win-bg: #F3F3F3;
+            --win-panel-bg: rgba(255, 255, 255, 0.95);
+            --win-border: #E5E5E5;
+            --win-border-dark: #D1D1D1;
+            --win-text: #202020;
+            --win-text-muted: #5D5D5D;
+            
+            /* Cor de Destaque Oficial Win 11 */
+            --win-accent: #005FB8; 
+            --win-accent-hover: #00509E;
+            --win-accent-active: #004285;
+            
+            /* Efeitos de Hover/Active do Fluent Design */
+            --win-hover-bg: rgba(0, 0, 0, 0.04);
+            --win-active-bg: rgba(0, 0, 0, 0.08);
+            
+            /* Arredondamento Win 11 */
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            
+            --sidebar-width: 280px;
+            --topbar-height: 54px;
+            
+            /* Cores do Documento Impresso */
+            --doc-border: #333333;
+        }
+
+        body {
+            background: var(--win-bg);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            color: var(--win-text);
+            /* Suavização de fontes */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ===== SCROLLBAR ESTILO WINDOWS 11 ===== */
+        ::-webkit-scrollbar {
+            width: 14px;
+            height: 14px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #C2C2C2;
+            border: 4px solid var(--win-bg); /* Criar efeito de "pílula" fina */
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #A0A0A0;
+        }
+        ::-webkit-scrollbar-button {
+            display: none;
+        }
+
+        /* ===== BARRA LATERAL (Fluent Design) ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--win-panel-bg);
+            border-right: 1px solid var(--win-border);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            backdrop-filter: blur(10px); /* Simula o efeito Mica */
+        }
+
+        .sidebar-header {
+            padding: 16px 20px;
+            color: var(--win-text);
+            font-weight: 600;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 4px;
+        }
+
+        .sidebar-header i {
+            font-size: 18px;
+            color: var(--win-accent);
+        }
+
+        .order-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 0 8px; /* Espaço lateral para o hover arredondado */
+        }
+
+        .order-item {
+            background: transparent;
+            padding: 10px 12px;
+            margin-bottom: 2px;
+            border: none;
+            border-radius: var(--radius-sm); /* Cantos Win 11 */
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.15s ease-in-out;
+            font-size: 14px;
+        }
+
+        .order-item:hover {
+            background: var(--win-hover-bg);
+        }
+
+        .order-item.active {
+            background: var(--win-hover-bg);
+            /* Win 11 indica seleção com um tracinho azul sutil à esquerda (pill) */
+            position: relative;
+        }
+
+        .order-item.active::before {
+            content: '';
+            position: absolute;
+            left: 2px;
+            top: 25%;
+            height: 50%;
+            width: 3px;
+            background: var(--win-accent);
+            border-radius: 4px;
+        }
+
+        .order-item span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 170px;
+            color: var(--win-text);
+        }
+
+        .order-item .fa-file-alt {
+            color: var(--win-accent);
+            margin-right: 12px;
+            opacity: 0.8;
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: var(--win-text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 6px 8px;
+            border-radius: var(--radius-sm);
+            transition: all 0.15s;
+        }
+
+        .delete-btn:hover {
+            background: #C42B1C; /* Vermelho padrão do Win 11 */
+            color: white;
+        }
+
+        /* ===== ÁREA PRINCIPAL ===== */
+        .main-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: calc(100% - var(--sidebar-width));
+            background: var(--win-bg);
+        }
+
+        /* ===== BARRA DE FERRAMENTAS (Cabeçalho limpo Win 11) ===== */
+        .topbar {
+            height: var(--topbar-height);
+            background: var(--win-panel-bg);
+            border-bottom: 1px solid var(--win-border);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 16px;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        .topbar .brand {
+            font-weight: 600;
+            font-size: 15px;
+            color: var(--win-text);
+            margin-right: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .topbar .brand i {
+            color: var(--win-accent);
+            font-size: 18px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* ===== BOTÕES ESTILO WINDOWS 11 ===== */
+        .btn {
+            padding: 6px 16px;
+            background: #FDFDFD;
+            border: 1px solid var(--win-border-dark);
+            border-bottom: 1px solid #B0B0B0; /* Linha sutil inferior do Win 11 */
+            border-radius: var(--radius-sm);
+            color: var(--win-text);
+            font-weight: 400;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.1s ease-in-out;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03); /* Elevação muito sutil */
+        }
+
+        .btn i {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .btn:hover {
+            background: #F6F6F6;
+        }
+
+        .btn:active {
+            background: #EBEBEB;
+            border-bottom-color: var(--win-border-dark);
+            transform: translateY(1px); /* Feedback tátil */
+            box-shadow: none;
+        }
+
+        .btn-primary {
+            background: var(--win-accent);
+            color: white;
+            border: 1px solid transparent;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2); /* Sombra interna inferor padrão */
+        }
+
+        .btn-primary i {
+            color: white;
+            opacity: 1;
+        }
+
+        .btn-primary:hover {
+            background: var(--win-accent-hover);
+        }
+
+        .btn-primary:active {
+            background: var(--win-accent-active);
+        }
+
+        .btn-success {
+            background: #107C10; 
+            color: white;
+            border: 1px solid transparent;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-success:hover { background: #0B5A0B; }
+        .btn-success:active { background: #094509; }
+
+        .btn-danger {
+            background: #C42B1C;
+            color: white;
+            border: 1px solid transparent;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-danger:hover { background: #9E2216; }
+        .btn-danger:active { background: #7A1A11; }
+
+        .menu-toggle {
+            display: none;
+            font-size: 18px;
+            padding: 6px 12px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+        
+        .menu-toggle:hover {
+            background: var(--win-hover-bg);
+        }
+
+        /* ===== CONTAINER DO PAPEL ===== */
+        .paper-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* ===== O PAPEL (Design Moderno Win 11 - Surface) ===== */
+        .page {
+            background-color: white;
+            width: 800px;
+            min-width: 800px;
+            /* No Win 11, janelas/cards têm cantos redondos de 8px e sombras belíssimas */
+            border-radius: var(--radius-md); 
+            border: 1px solid rgba(0,0,0,0.05);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.04); 
+            min-height: 1000px;
+        }
+
+        /* Por dentro do documento, mantemos linhas retas e limpas, 
+           simulando um formulário corporativo moderno para impressão */
+        .border-box {
+            border: 2px solid var(--doc-border);
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            height: 100%;
+            background: #ffffff;
+        }
+
+        /* ===== CAMPOS DO FORMULÁRIO ===== */
+        .flex-row {
+            display: flex;
+            border-bottom: 1px solid var(--doc-border);
+        }
+
+        .col {
+            border-right: 1px solid var(--doc-border);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            background: #ffffff;
+        }
+
+        .col:last-child {
+            border-right: none;
+        }
+
+        .label {
+            font-weight: 600;
+            font-size: 11px;
+            margin-right: 10px;
+            white-space: nowrap;
+            text-transform: uppercase;
+            color: var(--doc-border);
+            letter-spacing: 0.3px;
+        }
+
+        input[type="text"], input[type="number"] {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 14px;
+            background: transparent;
+            font-family: 'Segoe UI', sans-serif;
+            color: var(--win-text);
+            padding: 4px 6px;
+            border-radius: var(--radius-sm);
+            border-bottom: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        /* Efeito Fluído nos inputs */
+        input[type="text"]:hover, input[type="number"]:hover {
+            background: #FAFAFA;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
+            background: #F3F3F3;
+            /* Linha azul animada característica do Fluent Design */
+            border-bottom: 2px solid var(--win-accent);
+            border-radius: 4px 4px 0 0; 
+        }
+
+        /* ===== CABEÇALHO DO DOCUMENTO ===== */
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            border-bottom: 2px solid var(--doc-border);
+            background: white;
+        }
+
+        .pedido-box {
+            border: 2px solid var(--doc-border);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            width: 60%;
+            border-radius: 4px; /* Levemente arredondado mesmo impresso, opcional */
+        }
+
+        .pedido-box .label {
+            font-size: 18px;
+            margin-right: 15px;
+            font-weight: 700;
+            color: var(--doc-border);
+        }
+
+        .pedido-box input {
+            font-size: 24px;
+            font-weight: 600;
+            color: #000;
+            border-bottom: 2px solid transparent; /* para não quebrar o layout no focus */
+        }
+
+        .data-box {
+            border: 2px solid var(--doc-border);
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            width: 35%;
+            border-radius: 4px;
+        }
+
+        .data-box .label {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .data-inputs {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            width: 100%;
+        }
+
+        .data-inputs input {
+            width: 28%;
+            text-align: center;
+            border-bottom: 1px solid var(--doc-border);
+            font-weight: 600;
+            font-size: 15px;
+            border-radius: 0; 
+            padding: 2px;
+        }
+
+        .data-inputs input:focus {
+            border-bottom: 2px solid var(--win-accent);
+        }
+
+        .data-inputs span {
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--doc-border);
+        }
+
+        /* ===== TABELA DE ITENS ===== */
+        .items-section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border-right: 1px solid var(--doc-border);
+            border-bottom: 1px solid var(--doc-border);
+            padding: 8px 10px;
+        }
+
+        th:last-child, td:last-child {
+            border-right: none;
+        }
+
+        tr:last-child td {
+            border-bottom: 2px solid var(--doc-border);
+        }
+
+        th {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--doc-border);
+            background: #F9F9F9;
+            color: var(--doc-border);
+        }
+
+        .col-quant { width: 10%; text-align: center; }
+        .col-desc { width: 60%; }
+        .col-preco { width: 15%; text-align: center; }
+        .col-total { width: 15%; text-align: center; }
+
+        td input {
+            text-align: center;
+            font-size: 14px;
+        }
+
+        td.col-desc input {
+            text-align: left;
+        }
+
+        /* ===== RODAPÉ ===== */
+        .footer-section {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background: white;
+            border-top: 2px solid var(--doc-border);
+        }
+
+        .footer-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            width: 60%;
+        }
+
+        .footer-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 8px;
+        }
+
+        .footer-row input[type="text"] {
+            border-bottom: 1px solid var(--doc-border);
+            width: 180px;
+            border-radius: 0;
+            padding-bottom: 2px;
+        }
+
+        /* Checkbox Fluent Win 11 */
+        input[type="checkbox"] {
+            margin: 0 8px;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 1.5px solid #8A8A8A;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            background: white;
+            position: relative;
+            flex-shrink: 0;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        input[type="checkbox"]:hover {
+            border-color: #5D5D5D;
+        }
+
+        input[type="checkbox"]:checked {
+            background: var(--win-accent);
+            border-color: var(--win-accent);
+        }
+
+        input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .footer-right {
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            width: 40%;
+        }
+
+        .total-label {
+            font-size: 20px;
+            font-weight: 600;
+            margin-right: 15px;
+            color: var(--doc-border);
+        }
+
+        .total-value {
+            border-bottom: 2px solid var(--doc-border);
+            width: 160px;
+            font-size: 22px;
+            font-weight: 700;
+            text-align: right;
+            min-height: 30px;
+            padding: 0 6px;
+            color: #000;
+        }
+
+        /* ===== RESPONSIVO ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                left: -100%;
+                height: 100%;
+                box-shadow: 10px 0 30px rgba(0,0,0,0.15);
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .main-area {
+                width: 100%;
+            }
+            .menu-toggle {
+                display: inline-flex;
+            }
+            .topbar {
+                padding: 10px 16px;
+                justify-content: space-between;
+                gap: 8px;
+                height: auto;
+            }
+            .paper-container {
+                padding: 15px;
+            }
+
+            .page:not(.pdf-mode) {
+                width: 100%;
+                min-width: 100%;
+                min-height: auto;
+                padding: 15px;
+                /* Mantém o card flutuando em telas pequenas, bem Win 11 */
+            }
+            
+            .page:not(.pdf-mode) .header-section {
+                flex-direction: column;
+                border-bottom: none;
+                gap: 12px;
+                padding: 0;
+                margin-bottom: 15px;
+            }
+            .page:not(.pdf-mode) .pedido-box,
+            .page:not(.pdf-mode) .data-box {
+                width: 100%;
+            }
+            
+            .page:not(.pdf-mode) .flex-row {
+                flex-direction: column;
+                border-bottom: none;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+            .page:not(.pdf-mode) .col {
+                width: 100% !important;
+                border: 1px solid var(--win-border);
+                border-radius: var(--radius-sm);
+            }
+
+            .page:not(.pdf-mode) .items-section {
+                overflow-x: auto;
+                border: 1px solid var(--win-border);
+                border-radius: var(--radius-sm);
+                margin-top: 15px;
+            }
+            .page:not(.pdf-mode) table {
+                min-width: 600px;
+            }
+
+            .page:not(.pdf-mode) .footer-section {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px 0 0 0;
+            }
+            .page:not(.pdf-mode) .footer-left,
+            .page:not(.pdf-mode) .footer-right {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+
+        /* ===== PDF MODE - DIMENSÕES EXATAS A4 PARA IMPRESSÃO ===== */
+        .pdf-mode {
+            width: 2480px !important;
+            min-width: 2480px !important;
+            max-width: 2480px !important;
+            padding: 40px !important;
+            border: none !important;
+            background: white !important;
+            margin: 0 auto !important;
+            
+            /* É CRUCIAL tirar as sombras e cantos redondos na hora do PDF */
+            box-shadow: none !important;
+            border-radius: 0 !important; 
+            
+            min-height: 3508px !important;
+            height: auto !important;
+            overflow: visible !important;
+            display: block !important;
+            position: relative !important;
+            transform: none !important;
+            font-size: 16px !important;
+            line-height: 1.6 !important;
+        }
+
+        .pdf-mode .border-box {
+            border: 3px solid var(--doc-border) !important;
+            height: auto !important;
+            min-height: auto !important;
+            padding: 20px !important;
+        }
+
+        .pdf-mode .items-section { overflow: visible !important; }
+        .pdf-mode table { width: 100% !important; table-layout: fixed !important; }
+
+        .pdf-mode th, .pdf-mode td {
+            padding: 16px !important;
+            font-size: 18px !important;
+            border-right: 2px solid var(--doc-border) !important;
+            border-bottom: 2px solid var(--doc-border) !important;
+        }
+
+        .pdf-mode th {
+            font-size: 18px !important;
+            border-bottom: 3px solid var(--doc-border) !important;
+            background: #F9F9F9 !important;
+        }
+
+        .pdf-mode input {
+            font-size: 18px !important;
+            border: none !important;
+            background: transparent !important;
+            padding: 4px 0 !important;
+            border-radius: 0 !important;
+        }
+
+        .pdf-mode input[type="checkbox"] {
+            width: 24px !important;
+            height: 24px !important;
+            border: 2px solid var(--doc-border) !important;
+            border-radius: 4px !important;
+        }
+
+        .pdf-mode .label {
+            font-size: 16px !important;
+            margin-right: 12px !important;
+        }
+
+        .pdf-mode .pedido-box .label { font-size: 32px !important; }
+        .pdf-mode .pedido-box input { font-size: 36px !important; }
+        .pdf-mode .pedido-box {
+            border: 3px solid var(--doc-border) !important;
+            padding: 15px 25px !important;
+            border-radius: 6px !important;
+        }
+
+        .pdf-mode .data-box .label { font-size: 18px !important; }
+        .pdf-mode .data-inputs input {
+            font-size: 24px !important;
+            border-bottom: 2px solid var(--doc-border) !important;
+            width: 25% !important;
+        }
+        .pdf-mode .data-inputs span { font-size: 28px !important; }
+        .pdf-mode .data-box {
+            border: 3px solid var(--doc-border) !important;
+            padding: 15px 20px !important;
+            border-radius: 6px !important;
+        }
+
+        .pdf-mode .total-label { font-size: 32px !important; }
+        .pdf-mode .total-value {
+            font-size: 36px !important;
+            border-bottom: 3px solid var(--doc-border) !important;
+            width: 220px !important;
+            min-height: 45px !important;
+        }
+
+        .pdf-mode .flex-row { border-bottom: 2px solid var(--doc-border) !important; }
+        .pdf-mode .col { border-right: 2px solid var(--doc-border) !important; padding: 12px 20px !important; }
+        .pdf-mode .footer-section {
+            border-top: 3px solid var(--doc-border) !important;
+            padding: 25px !important;
+        }
+        .pdf-mode .footer-row input[type="text"] {
+            border-bottom: 2px solid var(--doc-border) !important;
+            width: 200px !important;
+            font-size: 20px !important;
+        }
+        .pdf-mode .header-section {
+            border-bottom: 3px solid var(--doc-border) !important;
+            padding: 25px !important;
+        }
+
+        /* ===== LOADING (Efeito Mica/Acrylic W11) ===== */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(243, 243, 243, 0.6); /* Fundo claro e translúcido */
+            backdrop-filter: blur(8px); /* Blur forte do Win 11 */
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .loading-overlay.active {
+            display: flex;
+        }
+        .loading-box {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 40px 70px;
+            border-radius: var(--radius-md); /* Cantos redondos de 8px */
+            box-shadow: 0 12px 40px rgba(0,0,0,0.12); /* Sombra difusa */
+            text-align: center;
+            min-width: 240px;
+        }
+        .loading-box i {
+            font-size: 46px;
+            color: var(--win-accent);
+            animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite; /* Giro mais moderno */
+        }
+        .loading-box .loading-text {
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--win-text);
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }

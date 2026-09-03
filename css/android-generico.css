@@ -1,161 +1,163 @@
-/* ===== ESTILO TOTALMENTE GENÉRICO (MODERN WEB / SAAS PADRÃO) ===== */
+/* ===== ESTILO ANDROID 8 OREO (Classic Material Design) ===== */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            /* Pilha de fontes universal e segura para web */
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
         }
 
         :root {
-            /* Paleta Neutra Web (Tailwind Slate/Gray Inspired) */
-            --app-bg: #F8FAFC;
-            --app-surface: #FFFFFF;
-            --app-border: #E2E8F0;
-            --app-border-focus: #2563EB;
+            /* Paleta Clássica Material Design */
+            --md-bg: #F5F5F6; /* Fundo cinza padrão do Android */
+            --md-surface: #FFFFFF;
             
-            /* Tipografia */
-            --app-text: #0F172A;
-            --app-text-muted: #64748B;
+            /* Material Blue 500 */
+            --md-primary: #2196F3;
+            --md-primary-dark: #1976D2;
             
-            /* Cor Primária Universal (Azul Corporativo) */
-            --app-primary: #2563EB;
-            --app-primary-hover: #1D4ED8;
+            /* Textos */
+            --md-text-primary: rgba(0, 0, 0, 0.87);
+            --md-text-secondary: rgba(0, 0, 0, 0.54);
+            --md-divider: rgba(0, 0, 0, 0.12);
             
-            --app-success: #16A34A;
-            --app-danger: #DC2626;
+            /* Cores de status */
+            --md-success: #4CAF50; /* Green 500 */
+            --md-danger: #F44336; /* Red 500 */
             
-            /* Arredondamento Padrão da Web */
-            --radius: 6px;
-            --radius-lg: 8px;
+            /* Curvas (Material Design 1 = 2px) */
+            --radius-classic: 2px;
             
-            /* Sombra Padrão Web */
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            /* Sombras Clássicas (Elevation) */
+            --elevation-2: 0 3px 1px -2px rgba(0,0,0,0.2), 0 2px 2px 0 rgba(0,0,0,0.14), 0 1px 5px 0 rgba(0,0,0,0.12);
+            --elevation-4: 0 2px 4px -1px rgba(0,0,0,0.2), 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12);
+            --elevation-8: 0 5px 5px -3px rgba(0,0,0,0.2), 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12);
+            --elevation-24: 0 11px 15px -7px rgba(0,0,0,0.2), 0 24px 38px 3px rgba(0,0,0,0.14), 0 9px 46px 8px rgba(0,0,0,0.12);
             
-            --sidebar-width: 260px;
-            --topbar-height: 56px;
-            --doc-border: #CBD5E1;
+            --sidebar-width: 280px;
+            --topbar-height: 56px; /* Altura clássica da Action Bar no Android */
+            
+            /* Cor suave para as grades da tabela na tela */
+            --doc-border: #9E9E9E; 
         }
 
         body {
-            background: var(--app-bg);
+            background: var(--md-bg);
             display: flex;
             height: 100vh;
             overflow: hidden;
-            color: var(--app-text);
-            font-size: 14px;
-            line-height: 1.5;
+            color: var(--md-text-primary);
         }
 
-        /* ===== SCROLLBAR PADRÃO DA WEB ===== */
+        /* ===== SCROLLBAR MATERIAL ===== */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #F1F5F9;
+            background: var(--md-bg);
         }
         ::-webkit-scrollbar-thumb {
-            background: #CBD5E1;
-            border-radius: var(--radius);
+            background-color: #BDBDBD;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #94A3B8;
+            background-color: #9E9E9E;
         }
 
-        /* ===== BARRA LATERAL (Sidebar Convencional) ===== */
+        /* ===== BARRA LATERAL (Navigation Drawer) ===== */
         .sidebar {
             width: var(--sidebar-width);
-            background: var(--app-surface);
-            border-right: 1px solid var(--app-border);
+            background: var(--md-surface);
             display: flex;
             flex-direction: column;
             height: 100vh;
-            transition: transform 0.2s ease-in-out;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
             z-index: 1000;
+            box-shadow: var(--elevation-8); /* Sombra pesada projetada para a direita */
         }
 
         .sidebar-header {
-            padding: 16px;
-            color: var(--app-text);
-            font-weight: 600;
-            font-size: 16px;
-            border-bottom: 1px solid var(--app-border);
+            padding: 24px 16px 16px 16px;
+            background: var(--md-primary); /* Fundo colorido no header do menu (estilo conta Google) */
+            color: #FFFFFF;
+            font-weight: 500;
+            font-size: 20px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 16px;
+            box-shadow: 0 2px 2px rgba(0,0,0,0.1);
         }
 
         .sidebar-header i {
-            font-size: 18px;
-            color: var(--app-primary);
+            font-size: 24px;
+            color: #FFFFFF;
         }
 
         .order-list {
             flex-grow: 1;
             overflow-y: auto;
-            padding: 12px;
+            padding: 8px 0;
         }
 
         .order-item {
-            background: var(--app-surface);
-            padding: 10px 12px;
-            margin-bottom: 4px;
-            border: 1px solid transparent;
-            border-radius: var(--radius);
+            background: transparent;
+            padding: 14px 16px;
+            border: none;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.15s ease;
+            transition: background 0.2s;
             font-size: 14px;
-            color: var(--app-text);
+            font-weight: 500;
+            color: var(--md-text-primary);
         }
 
         .order-item:hover {
-            background: #F1F5F9;
-            color: var(--app-text);
+            background: #EEEEEE;
         }
 
         .order-item.active {
-            background: #EFF6FF;
-            border-color: #BFDBFE;
-            color: var(--app-primary);
-            font-weight: 500;
+            background: #E3F2FD; /* Fundo azul bem claro */
+            color: var(--md-primary);
         }
 
         .order-item span {
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-width: 150px;
+            max-width: 170px;
         }
 
         .order-item .fa-file-alt {
-            font-size: 14px;
-            color: var(--app-text-muted);
-            margin-right: 8px;
+            font-size: 20px;
+            color: var(--md-text-secondary);
+            margin-right: 16px;
         }
-
+        
         .order-item.active .fa-file-alt {
-            color: var(--app-primary);
+            color: var(--md-primary);
         }
 
         .delete-btn {
             background: transparent;
             border: none;
-            color: var(--app-text-muted);
+            color: var(--md-text-secondary);
             cursor: pointer;
-            font-size: 14px;
-            border-radius: var(--radius);
-            padding: 4px 6px;
-            transition: all 0.15s;
+            font-size: 18px;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s, color 0.2s;
         }
 
         .delete-btn:hover {
-            background: #FEE2E2;
-            color: var(--app-danger);
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--md-danger);
         }
 
         /* ===== ÁREA PRINCIPAL ===== */
@@ -165,29 +167,34 @@
             flex-direction: column;
             height: 100vh;
             width: calc(100% - var(--sidebar-width));
-            background: var(--app-bg);
+            background: var(--md-bg);
         }
 
-        /* ===== BARRA SUPERIOR (Navbar Padrão) ===== */
+        /* ===== BARRA DE FERRAMENTAS (App Bar Clássica) ===== */
         .topbar {
             height: var(--topbar-height);
-            background: var(--app-surface);
-            border-bottom: 1px solid var(--app-border);
+            background: var(--md-primary);
+            color: #FFFFFF;
             display: flex;
             align-items: center;
-            padding: 0 24px;
-            gap: 12px;
+            padding: 0 16px;
+            gap: 16px;
             z-index: 10;
+            box-shadow: var(--elevation-4);
         }
 
         .topbar .brand {
-            font-weight: 600;
-            font-size: 15px;
-            color: var(--app-text);
+            font-weight: 500;
+            font-size: 20px;
+            color: #FFFFFF;
             margin-right: auto;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+        }
+
+        .topbar .brand i {
+            font-size: 24px;
         }
 
         .topbar-actions {
@@ -196,73 +203,65 @@
             flex-wrap: wrap;
         }
 
-        /* ===== BOTÕES GENÉRICOS (Web Standard) ===== */
+        /* ===== BOTÕES ANDROID 8 (Raised Buttons) ===== */
         .btn {
             height: 36px;
-            padding: 0 14px;
-            background: var(--app-surface);
-            color: var(--app-text);
-            border: 1px solid var(--app-border);
-            border-radius: var(--radius);
+            padding: 0 16px;
+            background: var(--md-surface);
+            color: var(--md-text-primary);
+            border: none;
+            border-radius: var(--radius-classic);
             font-weight: 500;
-            font-size: 13px;
+            font-size: 14px;
+            text-transform: uppercase; /* Clássico Material: Texto sempre maiúsculo */
+            letter-spacing: 0.5px;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            box-shadow: var(--shadow-sm);
+            gap: 8px;
+            box-shadow: var(--elevation-2);
         }
+
+        .btn i { font-size: 18px; }
 
         .btn:hover {
-            background: #F8FAFC;
-            border-color: #CBD5E1;
+            background: #F5F5F5;
+            box-shadow: var(--elevation-4); /* Sombra sobe ao passar o mouse */
         }
-
+        
         .btn:active {
-            background: #F1F5F9;
+            background: #E0E0E0;
+            box-shadow: var(--elevation-8); /* Sombra sobe mais ao clicar (Ripple effect fake) */
         }
 
-        .btn-primary {
-            background: var(--app-primary);
-            color: #FFFFFF;
-            border-color: var(--app-primary);
-        }
+        /* Na Topbar, vamos fazer os botões saltarem no fundo azul */
+        .topbar .btn-primary { background: #FFFFFF; color: var(--md-primary); }
+        .topbar .btn-primary:hover { background: #F5F5F5; }
+        
+        /* Fora da topbar */
+        .btn-success { background: var(--md-success); color: white; }
+        .btn-success:hover { background: #43A047; }
 
-        .btn-primary:hover {
-            background: var(--app-primary-hover);
-            border-color: var(--app-primary-hover);
-            color: #FFFFFF;
-        }
-
-        .btn-success {
-            background: var(--app-success);
-            color: #FFFFFF;
-            border-color: var(--app-success);
-        }
-
-        .btn-success:hover {
-            background: #15803D;
-            border-color: #15803D;
-            color: #FFFFFF;
-        }
-
-        .btn-danger {
-            background: var(--app-danger);
-            color: #FFFFFF;
-            border-color: var(--app-danger);
-        }
-
-        .btn-danger:hover {
-            background: #B91C1C;
-            border-color: #B91C1C;
-            color: #FFFFFF;
-        }
+        .btn-danger { background: var(--md-danger); color: white; }
+        .btn-danger:hover { background: #E53935; }
 
         .menu-toggle {
             display: none;
-            font-size: 16px;
-            padding: 6px 10px;
+            font-size: 24px;
+            color: #FFFFFF;
+            background: transparent;
+            border: none;
+            width: 48px;
+            height: 48px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .menu-toggle:active {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
         }
 
         /* ===== CONTAINER DO PAPEL ===== */
@@ -276,29 +275,28 @@
             align-items: flex-start;
         }
 
-        /* ===== O PAPEL (Card Clássico com Borda Fina) ===== */
+        /* ===== O PAPEL (Material Card) ===== */
         .page {
-            background-color: var(--app-surface);
+            background-color: var(--md-surface);
             width: 800px;
             min-width: 800px;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--app-border);
-            padding: 32px;
+            border-radius: var(--radius-classic); /* Canto quase reto, 2px */
+            border: none;
+            padding: 24px;
             display: flex;
             flex-direction: column;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--elevation-2); /* Sombra leve de papel */
             min-height: 1000px;
         }
 
-        /* Estrutura interna em tabela clássica */
+        /* Estrutura interna: Grades cinzas clássicas */
         .border-box {
             border: 1px solid var(--doc-border);
-            border-radius: var(--radius);
             display: flex;
             flex-direction: column;
             flex-grow: 1;
             height: 100%;
-            background: #FFFFFF;
+            background: var(--md-surface);
         }
 
         /* ===== CAMPOS DO FORMULÁRIO ===== */
@@ -309,82 +307,79 @@
 
         .col {
             border-right: 1px solid var(--doc-border);
-            padding: 10px 12px;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
-            background: #FFFFFF;
+            background: var(--md-surface);
         }
 
         .col:last-child { border-right: none; }
 
         .label {
-            font-weight: 600;
-            font-size: 11px;
-            margin-right: 8px;
-            text-transform: uppercase;
-            color: var(--app-text-muted);
-            letter-spacing: 0.3px;
+            font-weight: 500;
+            font-size: 12px;
+            margin-right: 12px;
+            color: var(--md-text-secondary);
+            letter-spacing: 0.5px;
         }
 
-        /* Inputs Padrão Web */
+        /* Inputs Clássicos Android (Bottom Line Only) */
         input[type="text"], input[type="number"] {
-            border: 1px solid transparent;
+            border: none;
             outline: none;
             width: 100%;
-            font-size: 13px;
+            font-size: 16px;
             background: transparent;
-            color: var(--app-text);
-            padding: 4px 6px;
-            border-radius: var(--radius);
-            transition: all 0.15s ease;
+            color: var(--md-text-primary);
+            padding: 6px 0;
+            border-bottom: 1px solid var(--md-text-secondary); /* Linha base cinza */
+            transition: border-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Anel de Foco Clássico da Web (Focus Ring) */
+        /* Animação foco: A linha fica azul e ligeiramente mais grossa */
         input[type="text"]:focus, input[type="number"]:focus {
-            background: #FFFFFF;
-            border-color: var(--app-border-focus);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+            border-bottom: 2px solid var(--md-primary);
         }
 
         /* ===== CABEÇALHO DO DOCUMENTO ===== */
         .header-section {
             display: flex;
             justify-content: space-between;
-            padding: 20px;
+            padding: 24px;
             border-bottom: 1px solid var(--doc-border);
         }
 
         .pedido-box {
-            border: 1px solid var(--doc-border);
-            padding: 10px 14px;
+            border: 1px solid var(--md-primary);
+            padding: 8px 16px;
             display: flex;
             align-items: center;
             width: 60%;
-            border-radius: var(--radius);
-            background: #F8FAFC;
+            border-radius: var(--radius-classic);
         }
 
         .pedido-box .label {
-            font-size: 14px;
-            margin-right: 12px;
-            color: var(--app-text);
-            font-weight: 600;
+            font-size: 16px;
+            margin-right: 16px;
+            color: var(--md-primary);
+            font-weight: 500;
         }
 
         .pedido-box input {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--app-text);
+            font-size: 24px;
+            font-weight: 500;
+            border-bottom: none; /* Esconde a linha aqui para ficar mais bonito */
         }
+        
+        .pedido-box input:focus { border-bottom: 2px solid var(--md-primary); }
 
         .data-box {
             border: 1px solid var(--doc-border);
-            padding: 10px 14px;
+            padding: 8px 16px;
             display: flex;
             align-items: center;
             width: 35%;
-            border-radius: var(--radius);
-            background: #F8FAFC;
+            border-radius: var(--radius-classic);
         }
 
         .data-inputs {
@@ -397,15 +392,12 @@
         .data-inputs input {
             width: 28%;
             text-align: center;
-            font-weight: 500;
-            font-size: 14px;
-            background: #FFFFFF;
-            border: 1px solid var(--doc-border);
+            font-size: 16px;
         }
 
         .data-inputs span {
-            font-size: 14px;
-            color: var(--app-text-muted);
+            font-size: 20px;
+            color: var(--md-text-secondary);
         }
 
         /* ===== TABELA DE ITENS ===== */
@@ -423,19 +415,18 @@
         th, td {
             border-right: 1px solid var(--doc-border);
             border-bottom: 1px solid var(--doc-border);
-            padding: 8px 12px;
+            padding: 12px 16px;
         }
 
         th:last-child, td:last-child { border-right: none; }
         tr:last-child td { border-bottom: none; }
 
         th {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            background: #F8FAFC;
-            color: var(--app-text-muted);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--md-text-secondary);
             text-align: left;
+            background: #F5F5F5;
         }
 
         .col-quant { width: 10%; text-align: center; }
@@ -444,15 +435,15 @@
         .col-total { width: 15%; text-align: center; }
 
         td th.col-quant, td th.col-preco, td th.col-total { text-align: center; }
-        td input { text-align: center; }
+        td input { text-align: center; border-bottom: none; }
+        td input:focus { border-bottom: 2px solid var(--md-primary); }
         td.col-desc input { text-align: left; }
 
         /* ===== RODAPÉ ===== */
         .footer-section {
             display: flex;
             justify-content: space-between;
-            padding: 20px;
-            background: #FFFFFF;
+            padding: 24px;
             border-top: 1px solid var(--doc-border);
         }
 
@@ -466,47 +457,40 @@
         .footer-row {
             display: flex;
             align-items: center;
-            margin-bottom: 8px;
-            gap: 10px;
+            margin-bottom: 16px;
+            gap: 16px;
         }
 
         .footer-row input[type="text"] {
             width: 200px;
-            border-bottom: 1px solid var(--doc-border);
-            border-radius: 0;
-            padding-left: 0;
         }
 
-        /* Checkbox Quadrado Moderno Universal */
+        /* Checkbox Clássico Material Design */
         input[type="checkbox"] {
             appearance: none;
-            width: 16px;
-            height: 16px;
-            border: 1px solid #CBD5E1;
-            border-radius: 4px;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--md-text-secondary);
+            border-radius: 2px;
             cursor: pointer;
-            background: #FFFFFF;
+            background: transparent;
             position: relative;
             flex-shrink: 0;
-            transition: all 0.15s ease;
-        }
-
-        input[type="checkbox"]:hover {
-            border-color: #94A3B8;
+            transition: all 0.2s ease-in-out;
         }
 
         input[type="checkbox"]:checked {
-            background: var(--app-primary);
-            border-color: var(--app-primary);
+            background: var(--md-primary);
+            border-color: var(--md-primary);
         }
 
         input[type="checkbox"]:checked::after {
             content: '';
             position: absolute;
             left: 5px;
-            top: 2px;
-            width: 4px;
-            height: 8px;
+            top: 1px;
+            width: 5px;
+            height: 10px;
             border: solid white;
             border-width: 0 2px 2px 0;
             transform: rotate(45deg);
@@ -520,19 +504,19 @@
         }
 
         .total-label {
-            font-size: 16px;
-            font-weight: 600;
-            margin-right: 12px;
-            color: var(--app-text-muted);
+            font-size: 20px;
+            font-weight: 500;
+            margin-right: 16px;
+            color: var(--md-text-secondary);
         }
 
         .total-value {
-            width: 150px;
-            font-size: 22px;
-            font-weight: 700;
+            width: 160px;
+            font-size: 28px;
+            font-weight: 500;
             text-align: right;
-            color: var(--app-text);
-            padding: 0 4px;
+            color: var(--md-primary);
+            border-bottom: 2px solid var(--md-primary);
         }
 
         /* ===== RESPONSIVO ===== */
@@ -541,14 +525,16 @@
                 position: absolute;
                 left: -100%;
                 height: 100%;
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+                box-shadow: var(--elevation-24); /* Drawer mobile precisa de sombra máxima */
             }
             .sidebar.active { left: 0; }
             .main-area { width: 100%; }
-            .topbar { padding: 0 16px; }
-            .menu-toggle { display: inline-flex; }
             
-            .paper-container { padding: 12px; }
+            .topbar { padding: 0 16px; }
+            .menu-toggle { display: flex; }
+            .topbar .brand { display: flex; }
+            
+            .paper-container { padding: 8px; }
 
             .page:not(.pdf-mode) {
                 width: 100%;
@@ -556,38 +542,45 @@
                 min-height: auto;
                 padding: 16px;
             }
+            
             .page:not(.pdf-mode) .border-box { border: none; }
+
             .page:not(.pdf-mode) .header-section {
                 flex-direction: column;
                 border-bottom: none;
-                gap: 12px;
+                gap: 16px;
                 padding: 0;
                 margin-bottom: 16px;
             }
             .page:not(.pdf-mode) .pedido-box,
-            .page:not(.pdf-mode) .data-box { width: 100%; }
+            .page:not(.pdf-mode) .data-box {
+                width: 100%;
+            }
+            
             .page:not(.pdf-mode) .flex-row {
                 flex-direction: column;
                 border-bottom: none;
-                gap: 8px;
-                margin-bottom: 8px;
+                gap: 12px;
+                margin-bottom: 12px;
             }
             .page:not(.pdf-mode) .col {
                 width: 100% !important;
-                border: 1px solid var(--app-border);
-                border-radius: var(--radius);
+                border: 1px solid var(--md-divider);
+                border-radius: var(--radius-classic);
             }
+
             .page:not(.pdf-mode) .items-section {
                 overflow-x: auto;
-                border: 1px solid var(--app-border);
-                border-radius: var(--radius);
-                margin-top: 12px;
+                border: 1px solid var(--md-divider);
+                border-radius: var(--radius-classic);
+                margin-top: 16px;
             }
             .page:not(.pdf-mode) table { min-width: 600px; }
+
             .page:not(.pdf-mode) .footer-section {
                 flex-direction: column;
-                gap: 16px;
-                padding: 16px 0 0 0;
+                gap: 24px;
+                padding: 24px 0 0 0;
                 border-top: none;
             }
             .page:not(.pdf-mode) .footer-left,
@@ -597,7 +590,7 @@
             }
         }
 
-        /* ===== PDF MODE - TOTALMENTE PRONTO PARA IMPRESSÃO A4 ===== */
+        /* ===== PDF MODE - PRETO, BRANCO E QUADRADO (PERFEITO PARA A4) ===== */
         .pdf-mode {
             width: 2480px !important;
             min-width: 2480px !important;
@@ -619,7 +612,7 @@
         }
 
         .pdf-mode .border-box {
-            border: 2px solid black !important;
+            border: 3px solid black !important;
             border-radius: 0 !important;
             height: auto !important;
             min-height: auto !important;
@@ -638,8 +631,8 @@
 
         .pdf-mode th {
             font-size: 18px !important;
-            border-bottom: 2px solid black !important;
-            background: #F8FAFC !important;
+            border-bottom: 3px solid black !important;
+            background: rgba(0,0,0,0.05) !important;
             color: black !important;
         }
 
@@ -650,30 +643,31 @@
             padding: 4px 0 !important;
             border-radius: 0 !important;
             color: black !important;
+            box-shadow: none !important;
         }
 
         .pdf-mode input[type="checkbox"] {
-            width: 22px !important;
-            height: 22px !important;
-            border: 2px solid black !important;
-            border-radius: 2px !important; 
+            width: 24px !important;
+            height: 24px !important;
+            border: 3px solid black !important;
+            border-radius: 0 !important; 
             background: transparent !important;
         }
         
         .pdf-mode input[type="checkbox"]:checked::after {
             border-color: black !important;
-            width: 6px !important;
-            height: 12px !important;
-            top: 1px !important;
-            left: 6px !important;
-            border-width: 0 2px 2px 0 !important;
+            width: 8px !important;
+            height: 14px !important;
+            top: -1px !important;
+            left: 5px !important;
         }
 
         .pdf-mode .label { font-size: 16px !important; color: black !important; }
+
         .pdf-mode .pedido-box .label { font-size: 32px !important; color: black !important;}
-        .pdf-mode .pedido-box input { font-size: 36px !important; color: black !important;}
+        .pdf-mode .pedido-box input { font-size: 36px !important; color: black !important; border:none !important;}
         .pdf-mode .pedido-box {
-            border: 2px solid black !important;
+            border: 3px solid black !important;
             background: transparent !important;
             padding: 15px 25px !important;
             border-radius: 0 !important;
@@ -684,12 +678,10 @@
             font-size: 24px !important;
             border-bottom: 2px solid black !important;
             width: 25% !important;
-            background: transparent !important;
-            border-radius: 0 !important;
         }
         .pdf-mode .data-inputs span { font-size: 28px !important; color: black !important; }
         .pdf-mode .data-box {
-            border: 2px solid black !important;
+            border: 3px solid black !important;
             background: transparent !important;
             padding: 15px 20px !important;
             border-radius: 0 !important;
@@ -701,13 +693,13 @@
             width: 220px !important;
             min-height: 45px !important;
             color: black !important;
-            border-bottom: 2px solid black !important;
+            border-bottom: 3px solid black !important;
         }
 
         .pdf-mode .flex-row { border-bottom: 2px solid black !important; }
         .pdf-mode .col { border-right: 2px solid black !important; padding: 12px 20px !important; }
         .pdf-mode .footer-section {
-            border-top: 2px solid black !important;
+            border-top: 3px solid black !important;
             padding: 25px !important;
             background: white !important;
         }
@@ -717,17 +709,17 @@
             font-size: 20px !important;
         }
         .pdf-mode .header-section {
-            border-bottom: 2px solid black !important;
+            border-bottom: 3px solid black !important;
             padding: 25px !important;
             background: white !important;
         }
 
-        /* ===== LOADING (Modal Simples Padrão) ===== */
+        /* ===== LOADING (Modal Clássico Android) ===== */
         .loading-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.4); /* Backdrop escurecido clássico */
+            background: rgba(0, 0, 0, 0.5); /* Fundo escuro simples */
             z-index: 9999;
             justify-content: center;
             align-items: center;
@@ -735,24 +727,23 @@
         }
         .loading-overlay.active { display: flex; }
         .loading-box {
-            background: var(--app-surface);
-            padding: 24px 36px;
-            border-radius: var(--radius-lg);
+            background: var(--md-surface);
+            padding: 24px 32px;
+            border-radius: var(--radius-classic); /* Caixa levemente quadrada */
             text-align: center;
-            min-width: 180px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--app-border);
+            min-width: 240px;
+            box-shadow: var(--elevation-24); /* Dialog sempre tem sombra 24 */
         }
         .loading-box i {
-            font-size: 32px;
-            color: var(--app-primary);
-            animation: spin 0.8s linear infinite;
+            font-size: 48px;
+            color: var(--md-primary);
+            animation: spin 1.2s linear infinite;
         }
         .loading-box .loading-text {
-            margin-top: 12px;
-            font-size: 14px;
+            margin-top: 16px;
+            font-size: 16px;
             font-weight: 500;
-            color: var(--app-text);
+            color: var(--md-text-primary);
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
