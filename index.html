@@ -563,43 +563,50 @@
 
         // --- GERADOR DE PDF ---
         function gerarPDF() {
-            const element = document.getElementById('folha-pedido');
-            const nomeCli = document.getElementById('cli-nome').value || 'Avulso';
-            
-            // PREPARA OS INPUTS
-            document.querySelectorAll('input').forEach(inp => {
-                if(inp.type === 'checkbox') {
-                    if(inp.checked) inp.setAttribute('checked', 'checked');
-                    else inp.removeAttribute('checked');
-                } else {
-                    inp.setAttribute('value', inp.value);
-                }
-            });
-
-            element.classList.add('pdf-mode');
-
-            // ADICIONADA A REGRA DE QUEBRA DE PÁGINA (avoid: 'tr' = Não corte linhas no meio)
-            const opt = {
-                margin:       5,
-                filename:     `Pedido_${nomeCli}.pdf`,
-                image:        { type: 'jpeg', quality: 1 },
-                pagebreak:    { mode: 'css', avoid: 'tr' }, // Evita cortar texto da tabela
-                html2canvas:  { 
-                    scale: 2, 
-                    windowWidth: 820 
-                },
-                jsPDF:        { 
-                    unit: 'mm', 
-                    format: 'a4', 
-                    orientation: 'portrait' 
-                }
-            };
-
-            // Gera o PDF e volta o layout de celular se necessário
-            html2pdf().set(opt).from(element).save().then(() => {
-                element.classList.remove('pdf-mode');
-            });
+    const element = document.getElementById('folha-pedido');
+    const nomeCli = document.getElementById('cli-nome').value || 'Avulso';
+    
+    document.querySelectorAll('input').forEach(inp => {
+        if(inp.type === 'checkbox') {
+            if(inp.checked) inp.setAttribute('checked', 'checked');
+            else inp.removeAttribute('checked');
+        } else {
+            inp.setAttribute('value', inp.value);
         }
+    });
+
+    element.classList.add('pdf-mode');
+
+    // Força layout antes de capturar
+    const larguraReal = element.scrollWidth;
+    const alturaReal = element.scrollHeight;
+
+    const opt = {
+        margin:       0,
+        filename:     `Pedido_${nomeCli}.pdf`,
+        image:        { type: 'jpeg', quality: 1 },
+        pagebreak:    { mode: ['css', 'legacy'], avoid: 'tr' },
+        html2canvas:  { 
+            scale: 2, 
+            width: larguraReal,
+            height: alturaReal,
+            windowWidth: larguraReal,
+            windowHeight: alturaReal,
+            scrollX: 0,
+            scrollY: 0,
+            useCORS: true
+        },
+        jsPDF:        { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: 'portrait' 
+        }
+    };
+
+    html2pdf().set(opt).from(element).save().then(() => {
+        element.classList.remove('pdf-mode');
+    });
+}
 
         window.onload = () => {
             renderSidebarList();
