@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gerenciador de Pedidos</title>
     <!-- Biblioteca para gerar PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -56,17 +56,18 @@
         .order-item {
             background: #333;
             padding: 10px;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             border-radius: 5px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: 0.2s;
         }
 
         .order-item:hover { background: #444; }
-        .order-item span { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px;}
-        .delete-btn { background: #ff4444; border: none; color: white; border-radius: 3px; padding: 2px 5px; cursor: pointer; font-weight: bold;}
+        .order-item span { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px;}
+        .delete-btn { background: #ff4444; border: none; color: white; border-radius: 3px; padding: 4px 8px; cursor: pointer; font-weight: bold;}
 
         /* ÁREA PRINCIPAL */
         .main-area {
@@ -74,6 +75,7 @@
             display: flex;
             flex-direction: column;
             height: 100vh;
+            width: calc(100% - var(--sidebar-width));
         }
 
         /* BARRA SUPERIOR DE BOTÕES */
@@ -86,6 +88,7 @@
             padding: 0 20px;
             gap: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 10;
         }
 
         .btn {
@@ -97,6 +100,7 @@
             cursor: pointer;
             border-radius: 5px;
             transition: all 0.2s;
+            white-space: nowrap;
         }
         .btn:hover { background: black; color: white; }
         
@@ -106,23 +110,25 @@
         .paper-container {
             flex-grow: 1;
             overflow-y: auto;
-            overflow-x: auto;
+            overflow-x: hidden;
             padding: 20px;
             display: flex;
             justify-content: center;
             align-items: flex-start;
         }
 
-        /* O PAPEL EM SI (DESIGN EXATO) */
+        /* O PAPEL EM SI */
         .page {
             background-color: white;
             width: 800px;
-            min-width: 800px; /* Impede que quebre no mobile, permite scroll */
+            min-width: 800px;
             border: 3px solid black;
             padding: 10px;
             display: flex;
             flex-direction: column;
             box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
+            /* Permite crescer conforme as linhas são adicionadas */
+            min-height: 1000px; 
         }
 
         .border-box {
@@ -130,6 +136,7 @@
             display: flex;
             flex-direction: column;
             flex-grow: 1;
+            height: 100%;
         }
 
         .flex-row { display: flex; border-bottom: 2px solid black; }
@@ -171,7 +178,7 @@
         .footer-left { display: flex; flex-direction: column; justify-content: space-around; width: 60%;}
         .footer-row { display: flex; align-items: center; margin-bottom: 5px;}
         .footer-row input[type="text"] { border-bottom: 1px solid black; width: 150px; margin-left: 5px;}
-        input[type="checkbox"] { margin: 0 5px; appearance: none; width: 15px; height: 15px; border: 2px solid black; cursor: pointer; }
+        input[type="checkbox"] { margin: 0 5px; appearance: none; width: 18px; height: 18px; border: 2px solid black; cursor: pointer; }
         input[type="checkbox"]:checked { background-color: black; }
         .footer-right { display: flex; align-items: flex-end; justify-content: flex-end; width: 40%; }
         .total-label { font-size: 24px; font-weight: 900; margin-right: 10px; }
@@ -179,13 +186,41 @@
 
         /* MOBILE RESPONSIVO */
         @media (max-width: 768px) {
-            .sidebar { position: absolute; left: -100%; height: 100%; }
-            .sidebar.active { left: 0; box-shadow: 2px 0 10px rgba(0,0,0,0.5); }
+            .sidebar { position: absolute; left: -100%; height: 100%; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
+            .sidebar.active { left: 0; }
+            .main-area { width: 100%; }
             .menu-toggle { display: block; }
-            .topbar { padding: 0 10px; justify-content: space-between;}
+            .topbar { padding: 0 10px; justify-content: space-between; gap: 5px; overflow-x: auto; }
             .topbar-actions { display: flex; gap: 5px; }
-            .btn { font-size: 12px; padding: 6px 10px; }
+            .btn { font-size: 11px; padding: 6px 8px; }
             .paper-container { padding: 10px; }
+
+            .page:not(.pdf-mode) { width: 100%; min-width: 100%; min-height: auto; padding: 5px; border: none; box-shadow: none; }
+            .page:not(.pdf-mode) .border-box { border: none; }
+            .page:not(.pdf-mode) .header-section { flex-direction: column; border-bottom: none; gap: 10px; padding: 0; margin-bottom: 10px; }
+            .page:not(.pdf-mode) .pedido-box { width: 100%; }
+            .page:not(.pdf-mode) .data-box { width: 100%; }
+            
+            .page:not(.pdf-mode) .flex-row { flex-direction: column; border-bottom: none; gap: 5px; margin-bottom: 5px; }
+            .page:not(.pdf-mode) .col { width: 100% !important; border: 1px solid #aaa; border-radius: 5px; padding: 8px; background: #fff; }
+            
+            .page:not(.pdf-mode) input[type="text"] { border-bottom: 1px solid #ddd; padding-bottom: 3px; font-size: 16px; }
+
+            .page:not(.pdf-mode) .items-section { overflow-x: auto; border: 1px solid #aaa; border-radius: 5px; margin-top: 10px; }
+            .page:not(.pdf-mode) table { min-width: 600px; } 
+
+            .page:not(.pdf-mode) .footer-section { flex-direction: column; gap: 15px; padding: 10px 0; }
+            .page:not(.pdf-mode) .footer-left { width: 100%; }
+            .page:not(.pdf-mode) .footer-right { width: 100%; justify-content: space-between; border-top: 2px solid black; padding-top: 10px;}
+        }
+
+        /* ESTILOS FORÇADOS PARA PDF */
+        .pdf-mode {
+            width: 800px !important;
+            min-width: 800px !important;
+            padding: 10px !important;
+            border: 3px solid black !important;
+            background: white !important;
         }
     </style>
 </head>
@@ -209,7 +244,7 @@
             <div class="topbar-actions">
                 <button class="btn" onclick="novoPedido()">+ Novo</button>
                 <button class="btn" onclick="salvarPedidoNomeado()">Salvar na Lista</button>
-                <button class="btn" onclick="gerarPDF()">Gerar PDF</button>
+                <button class="btn" onclick="gerarPDF()" style="background:#000; color:#fff;">Gerar PDF</button>
             </div>
         </div>
 
@@ -253,7 +288,7 @@
                         <div class="col" style="width: 45%;"><span class="label">INSC.ESTADUAL</span><input type="text" id="cli-ie" oninput="saveDraft()"></div>
                     </div>
 
-                    <!-- Tabela de Itens (Procedural) -->
+                    <!-- Tabela de Itens -->
                     <div class="items-section">
                         <table>
                             <thead>
@@ -299,7 +334,7 @@
     <script>
         const tbody = document.getElementById('items-body');
         const MIN_ROWS = 15;
-        let activeOrderId = null; // Para saber se estamos editando um pedido já salvo
+        let activeOrderId = null; 
 
         // --- SISTEMA DE UI ---
         function toggleSidebar() {
@@ -322,7 +357,7 @@
             return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
         }
 
-        // --- LÓGICA DA TABELA E CÁLCULOS (PROCEDURAL) ---
+        // --- LÓGICA DA TABELA ---
         function addRow(data = {q: '', d: '', p: '', t: ''}) {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -349,15 +384,16 @@
             const q = parseMoney(qInput.value);
             const p = parseMoney(pInput.value);
             
-            // Auto cálculo da linha
             if(q > 0 && p > 0 && !isNaN(q) && !isNaN(p)) {
                 tInput.value = formatMoney(q * p);
+            } else if (qInput.value === '' || pInput.value === '') {
+                tInput.value = '';
             }
 
-            // Procedural: Adiciona linha se digitar na última
             const allRows = tbody.querySelectorAll('tr');
             const lastRow = allRows[allRows.length - 1];
             
+            // REMOVIDO O LIMITE: Agora adiciona linha infinitamente se a última for preenchida
             if (currentRow === lastRow) {
                 let hasContent = Array.from(lastRow.querySelectorAll('input')).some(inp => inp.value.trim() !== '');
                 if (hasContent) addRow(); 
@@ -375,7 +411,6 @@
             totalDiv.innerText = total > 0 ? formatMoney(total) : '';
         }
 
-        // --- COLETAR E PREENCHER DADOS DA TELA ---
         function gatherData() {
             const data = {
                 pedido: document.getElementById('pedido-num').value,
@@ -433,45 +468,38 @@
             document.getElementById('val-cheque').value = data.rodape?.cheque || '';
             document.getElementById('val-sinal').value = data.rodape?.sinal || '';
 
-            tbody.innerHTML = ''; // Limpa linhas
+            tbody.innerHTML = ''; 
             if(data.itens && data.itens.length > 0) {
                 data.itens.forEach(item => addRow(item));
             }
             
-            // Completa com linhas vazias até o mínimo
             const currentRows = tbody.querySelectorAll('tr').length;
             for(let i = currentRows; i < MIN_ROWS; i++) addRow();
-            addRow(); // Adiciona +1 para o sistema procedural funcionar
+            addRow(); 
 
             calculateGrandTotal();
         }
 
-        // --- SISTEMA DE ARMAZENAMENTO (LOCAL STORAGE) ---
-        
-        // Salva silenciosamente o que está sendo digitado (Rascunho)
         function saveDraft() {
             localStorage.setItem('pedido_draft', JSON.stringify(gatherData()));
         }
 
-        // Salva na lista lateral (Nomeado)
         function salvarPedidoNomeado() {
             let nomeCliente = document.getElementById('cli-nome').value;
-            let nomePadrao = nomeCliente ? `Pedido de ${nomeCliente}` : "Novo Pedido";
+            let nomePadrao = nomeCliente ? `Pedido - ${nomeCliente}` : "Novo Pedido";
             
             let nome = prompt("Dê um nome para salvar este pedido:", nomePadrao);
-            if (!nome) return; // Cancelou
+            if (!nome) return; 
 
             let savedOrders = JSON.parse(localStorage.getItem('pedidos_lista') || '[]');
             
             if(activeOrderId) {
-                // Atualiza existente
                 let index = savedOrders.findIndex(o => o.id === activeOrderId);
                 if(index > -1) {
                     savedOrders[index].name = nome;
                     savedOrders[index].data = gatherData();
                 }
             } else {
-                // Cria novo
                 activeOrderId = Date.now().toString();
                 savedOrders.push({
                     id: activeOrderId,
@@ -491,28 +519,26 @@
             if(order) {
                 activeOrderId = order.id;
                 populateData(order.data);
-                saveDraft(); // Atualiza o rascunho com este pedido
+                saveDraft(); 
                 closeSidebarMobile();
             }
         }
 
         function deleteOrder(id, event) {
-            event.stopPropagation(); // Evita clicar e abrir o pedido ao mesmo tempo
+            event.stopPropagation();
             if(confirm("Tem certeza que deseja apagar este pedido?")) {
                 let savedOrders = JSON.parse(localStorage.getItem('pedidos_lista') || '[]');
                 savedOrders = savedOrders.filter(o => o.id !== id);
                 localStorage.setItem('pedidos_lista', JSON.stringify(savedOrders));
                 
-                if(activeOrderId === id) {
-                    novoPedido(); // Limpa a tela se apagou o que estava aberto
-                }
+                if(activeOrderId === id) novoPedido();
                 renderSidebarList();
             }
         }
 
         function novoPedido() {
             activeOrderId = null;
-            populateData({}); // Limpa a tela
+            populateData({});
             localStorage.removeItem('pedido_draft');
             closeSidebarMobile();
         }
@@ -539,22 +565,44 @@
         function gerarPDF() {
             const element = document.getElementById('folha-pedido');
             const nomeCli = document.getElementById('cli-nome').value || 'Avulso';
+            
+            // PREPARA OS INPUTS
+            document.querySelectorAll('input').forEach(inp => {
+                if(inp.type === 'checkbox') {
+                    if(inp.checked) inp.setAttribute('checked', 'checked');
+                    else inp.removeAttribute('checked');
+                } else {
+                    inp.setAttribute('value', inp.value);
+                }
+            });
+
+            element.classList.add('pdf-mode');
+
+            // ADICIONADA A REGRA DE QUEBRA DE PÁGINA (avoid: 'tr' = Não corte linhas no meio)
             const opt = {
-                margin:       [5, 5, 5, 5],
+                margin:       5,
                 filename:     `Pedido_${nomeCli}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                image:        { type: 'jpeg', quality: 1 },
+                pagebreak:    { mode: 'css', avoid: 'tr' }, // Evita cortar texto da tabela
+                html2canvas:  { 
+                    scale: 2, 
+                    windowWidth: 820 
+                },
+                jsPDF:        { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait' 
+                }
             };
 
-            html2pdf().set(opt).from(element).save();
+            // Gera o PDF e volta o layout de celular se necessário
+            html2pdf().set(opt).from(element).save().then(() => {
+                element.classList.remove('pdf-mode');
+            });
         }
 
-        // --- INICIALIZAÇÃO ---
         window.onload = () => {
             renderSidebarList();
-            
-            // Tenta carregar o rascunho, se não tiver, carrega em branco
             const draft = localStorage.getItem('pedido_draft');
             if (draft) {
                 populateData(JSON.parse(draft));
