@@ -3,233 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gerenciador de Pedidos</title>
+    <title>WinPedidos 7 - Gerenciador de Pedidos</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Biblioteca para gerar PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-        :root {
-            --bg-color: #e0e0e0;
-            --sidebar-width: 250px;
-            --topbar-height: 60px;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* BARRA LATERAL (SIDEBAR) */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: #1a1a1a;
-            color: white;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            transition: transform 0.3s ease;
-            z-index: 1000;
-        }
-
-        .sidebar-header {
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid #333;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .order-list {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 10px;
-        }
-
-        .order-item {
-            background: #333;
-            padding: 10px;
-            margin-bottom: 8px;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: 0.2s;
-        }
-
-        .order-item:hover { background: #444; }
-        .order-item span { font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px;}
-        .delete-btn { background: #ff4444; border: none; color: white; border-radius: 3px; padding: 4px 8px; cursor: pointer; font-weight: bold;}
-
-        /* ÁREA PRINCIPAL */
-        .main-area {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            width: calc(100% - var(--sidebar-width));
-        }
-
-        /* BARRA SUPERIOR DE BOTÕES */
-        .topbar {
-            height: var(--topbar-height);
-            background: white;
-            border-bottom: 2px solid #ccc;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            gap: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            z-index: 10;
-        }
-
-        .btn {
-            padding: 8px 15px;
-            border: 2px solid black;
-            background: white;
-            color: black;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-        .btn:hover { background: black; color: white; }
-        
-        .menu-toggle { display: none; }
-
-        /* CONTAINER DO PAPEL (SCROLL) */
-        .paper-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        /* O PAPEL EM SI */
-        .page {
-            background-color: white;
-            width: 800px;
-            min-width: 800px;
-            border: 3px solid black;
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
-            /* Permite crescer conforme as linhas são adicionadas */
-            min-height: 1000px; 
-        }
-
-        .border-box {
-            border: 2px solid black;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            height: 100%;
-        }
-
-        .flex-row { display: flex; border-bottom: 2px solid black; }
-        .col { border-right: 2px solid black; padding: 4px; display: flex; align-items: center; }
-        .col:last-child { border-right: none; }
-        
-        .label { font-weight: bold; font-size: 11px; margin-right: 5px; white-space: nowrap; text-transform: uppercase; }
-        
-        input[type="text"], input[type="number"] {
-            border: none; outline: none; width: 100%; font-size: 14px; background: transparent; font-family: monospace;
-        }
-
-        /* Cabeçalho */
-        .header-section { display: flex; justify-content: space-between; padding: 10px; border-bottom: 2px solid black; }
-        .pedido-box { border: 3px solid black; border-radius: 5px; padding: 5px 10px; display: flex; align-items: center; width: 60%; }
-        .pedido-box .label { font-size: 22px; margin-right: 10px; font-weight: 900;}
-        .pedido-box input { font-size: 22px; font-weight: bold; }
-        .data-box { border: 2px solid black; border-radius: 5px; padding: 5px; display: flex; align-items: flex-start; width: 35%; }
-        .data-inputs { display: flex; align-items: flex-end; justify-content: space-around; width: 100%; margin-top: 15px;}
-        .data-inputs input { width: 30%; text-align: center; border-bottom: 1px solid black; }
-        .data-inputs span { font-size: 20px; font-weight: bold;}
-
-        /* Tabela */
-        .items-section { flex-grow: 1; display: flex; flex-direction: column; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border-right: 2px solid black; border-bottom: 1px solid black; padding: 5px; }
-        th:last-child, td:last-child { border-right: none; }
-        tr:last-child td { border-bottom: 2px solid black; }
-        th { font-size: 14px; font-weight: 900; text-transform: uppercase; border-bottom: 2px solid black; }
-        .col-quant { width: 10%; text-align: center; }
-        .col-desc { width: 60%; }
-        .col-preco { width: 15%; text-align: center; }
-        .col-total { width: 15%; text-align: center; }
-        td input { text-align: center; }
-        td.col-desc input { text-align: left; }
-
-        /* Rodapé */
-        .footer-section { display: flex; justify-content: space-between; padding: 10px; }
-        .footer-left { display: flex; flex-direction: column; justify-content: space-around; width: 60%;}
-        .footer-row { display: flex; align-items: center; margin-bottom: 5px;}
-        .footer-row input[type="text"] { border-bottom: 1px solid black; width: 150px; margin-left: 5px;}
-        input[type="checkbox"] { margin: 0 5px; appearance: none; width: 18px; height: 18px; border: 2px solid black; cursor: pointer; }
-        input[type="checkbox"]:checked { background-color: black; }
-        .footer-right { display: flex; align-items: flex-end; justify-content: flex-end; width: 40%; }
-        .total-label { font-size: 24px; font-weight: 900; margin-right: 10px; }
-        .total-value { border-bottom: 2px solid black; width: 150px; font-size: 20px; font-weight: bold; text-align: right; min-height: 25px;}
-
-        /* MOBILE RESPONSIVO */
-        @media (max-width: 768px) {
-            .sidebar { position: absolute; left: -100%; height: 100%; box-shadow: 5px 0 15px rgba(0,0,0,0.5); }
-            .sidebar.active { left: 0; }
-            .main-area { width: 100%; }
-            .menu-toggle { display: block; }
-            .topbar { padding: 0 10px; justify-content: space-between; gap: 5px; overflow-x: auto; }
-            .topbar-actions { display: flex; gap: 5px; }
-            .btn { font-size: 11px; padding: 6px 8px; }
-            .paper-container { padding: 10px; }
-
-            .page:not(.pdf-mode) { width: 100%; min-width: 100%; min-height: auto; padding: 5px; border: none; box-shadow: none; }
-            .page:not(.pdf-mode) .border-box { border: none; }
-            .page:not(.pdf-mode) .header-section { flex-direction: column; border-bottom: none; gap: 10px; padding: 0; margin-bottom: 10px; }
-            .page:not(.pdf-mode) .pedido-box { width: 100%; }
-            .page:not(.pdf-mode) .data-box { width: 100%; }
-            
-            .page:not(.pdf-mode) .flex-row { flex-direction: column; border-bottom: none; gap: 5px; margin-bottom: 5px; }
-            .page:not(.pdf-mode) .col { width: 100% !important; border: 1px solid #aaa; border-radius: 5px; padding: 8px; background: #fff; }
-            
-            .page:not(.pdf-mode) input[type="text"] { border-bottom: 1px solid #ddd; padding-bottom: 3px; font-size: 16px; }
-
-            .page:not(.pdf-mode) .items-section { overflow-x: auto; border: 1px solid #aaa; border-radius: 5px; margin-top: 10px; }
-            .page:not(.pdf-mode) table { min-width: 600px; } 
-
-            .page:not(.pdf-mode) .footer-section { flex-direction: column; gap: 15px; padding: 10px 0; }
-            .page:not(.pdf-mode) .footer-left { width: 100%; }
-            .page:not(.pdf-mode) .footer-right { width: 100%; justify-content: space-between; border-top: 2px solid black; padding-top: 10px;}
-        }
-
-        /* ESTILOS FORÇADOS PARA PDF */
-        .pdf-mode {
-            width: 800px !important;
-            min-width: 800px !important;
-            padding: 10px !important;
-            border: 3px solid black !important;
-            background: white !important;
-        }
-    </style>
+    <!-- Biblioteca para gerar Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
 </head>
 <body>
+
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-box">
+            <i class="fas fa-spinner"></i>
+            <div class="loading-text">Gerando documento...</div>
+        </div>
+    </div>
 
     <!-- BARRA LATERAL -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            Pedidos Salvos
+            <i class="fas fa-folder-open"></i>
+            <span>Pedidos Salvos</span>
         </div>
         <div class="order-list" id="order-list">
             <!-- Itens carregados via JS -->
@@ -240,11 +37,29 @@
     <main class="main-area">
         <!-- Barra de Ferramentas -->
         <div class="topbar">
-            <button class="btn menu-toggle" onclick="toggleSidebar()">☰ Menu</button>
+            <div class="brand">
+                <i class="fas fa-file-invoice"></i>
+                <span>Pedidos</span>
+            </div>
+            <button class="btn menu-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
             <div class="topbar-actions">
-                <button class="btn" onclick="novoPedido()">+ Novo</button>
-                <button class="btn" onclick="salvarPedidoNomeado()">Salvar na Lista</button>
-                <button class="btn" onclick="gerarPDF()" style="background:#000; color:#fff;">Gerar PDF</button>
+                <button class="btn" onclick="novoPedido()">
+                    <i class="fas fa-plus"></i> Novo
+                </button>
+                <button class="btn btn-primary" onclick="salvarPedidoNomeado()">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+                <button class="btn btn-success" onclick="gerarPDFAltaQualidade()">
+                    <i class="fas fa-file-pdf"></i> PDF 300 DPI
+                </button>
+                <button class="btn" onclick="gerarPDFBaixaQualidade()">
+                    <i class="fas fa-file-pdf"></i> PDF 72 DPI
+                </button>
+                <button class="btn" onclick="exportarExcel()" style="background:linear-gradient(180deg,#1d7a3d 0%,#1a6a30 100%);border-color:#0a4a1a;color:white;">
+                    <i class="fas fa-file-excel"></i> Excel
+                </button>
             </div>
         </div>
 
@@ -262,8 +77,10 @@
                         <div class="data-box">
                             <span class="label">DATA</span>
                             <div class="data-inputs">
-                                <input type="text" id="data-d" maxlength="2" oninput="saveDraft()"> <span>/</span>
-                                <input type="text" id="data-m" maxlength="2" oninput="saveDraft()"> <span>/</span>
+                                <input type="text" id="data-d" maxlength="2" oninput="saveDraft()"> 
+                                <span>/</span>
+                                <input type="text" id="data-m" maxlength="2" oninput="saveDraft()"> 
+                                <span>/</span>
                                 <input type="text" id="data-a" maxlength="4" oninput="saveDraft()">
                             </div>
                         </div>
@@ -271,21 +88,48 @@
 
                     <!-- Dados Cliente -->
                     <div class="flex-row">
-                        <div class="col" style="width: 70%;"><span class="label">NOME:</span><input type="text" id="cli-nome" oninput="saveDraft()"></div>
-                        <div class="col" style="width: 30%;"><span class="label">TEL:</span><input type="text" id="cli-tel" oninput="saveDraft()"></div>
+                        <div class="col" style="width: 70%;">
+                            <span class="label"><i class="fas fa-user" style="margin-right:4px;"></i>NOME:</span>
+                            <input type="text" id="cli-nome" oninput="saveDraft()">
+                        </div>
+                        <div class="col" style="width: 30%;">
+                            <span class="label"><i class="fas fa-phone" style="margin-right:4px;"></i>TEL:</span>
+                            <input type="text" id="cli-tel" oninput="saveDraft()">
+                        </div>
                     </div>
                     <div class="flex-row">
-                        <div class="col" style="width: 70%;"><span class="label">ENDEREÇO:</span><input type="text" id="cli-end" oninput="saveDraft()"></div>
-                        <div class="col" style="width: 30%;"><span class="label">BAIRRO:</span><input type="text" id="cli-bairro" oninput="saveDraft()"></div>
+                        <div class="col" style="width: 70%;">
+                            <span class="label"><i class="fas fa-home" style="margin-right:4px;"></i>ENDEREÇO:</span>
+                            <input type="text" id="cli-end" oninput="saveDraft()">
+                        </div>
+                        <div class="col" style="width: 30%;">
+                            <span class="label">BAIRRO:</span>
+                            <input type="text" id="cli-bairro" oninput="saveDraft()">
+                        </div>
                     </div>
                     <div class="flex-row">
-                        <div class="col" style="width: 60%;"><span class="label">MUNICIPIO:</span><input type="text" id="cli-mun" oninput="saveDraft()"></div>
-                        <div class="col" style="width: 15%;"><span class="label">UF</span><input type="text" id="cli-uf" maxlength="2" style="text-align:center;" oninput="saveDraft()"></div>
-                        <div class="col" style="width: 25%;"><span class="label">CEP</span><input type="text" id="cli-cep" oninput="saveDraft()"></div>
+                        <div class="col" style="width: 60%;">
+                            <span class="label"><i class="fas fa-city" style="margin-right:4px;"></i>MUNICIPIO:</span>
+                            <input type="text" id="cli-mun" oninput="saveDraft()">
+                        </div>
+                        <div class="col" style="width: 15%;">
+                            <span class="label">UF</span>
+                            <input type="text" id="cli-uf" maxlength="2" style="text-align:center;" oninput="saveDraft()">
+                        </div>
+                        <div class="col" style="width: 25%;">
+                            <span class="label"><i class="fas fa-map-pin"></i> CEP</span>
+                            <input type="text" id="cli-cep" oninput="saveDraft()">
+                        </div>
                     </div>
                     <div class="flex-row">
-                        <div class="col" style="width: 55%;"><span class="label">CNPJ/CPF</span><input type="text" id="cli-doc" oninput="saveDraft()"></div>
-                        <div class="col" style="width: 45%;"><span class="label">INSC.ESTADUAL</span><input type="text" id="cli-ie" oninput="saveDraft()"></div>
+                        <div class="col" style="width: 55%;">
+                            <span class="label"><i class="fas fa-id-card" style="margin-right:4px;"></i>CNPJ/CPF</span>
+                            <input type="text" id="cli-doc" oninput="saveDraft()">
+                        </div>
+                        <div class="col" style="width: 45%;">
+                            <span class="label">INSC.ESTADUAL</span>
+                            <input type="text" id="cli-ie" oninput="saveDraft()">
+                        </div>
                     </div>
 
                     <!-- Tabela de Itens -->
@@ -293,10 +137,10 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th class="col-quant">QUANT.</th>
-                                    <th class="col-desc">DESCRIÇÃO</th>
-                                    <th class="col-preco">PREÇO<br>UNT.</th>
-                                    <th class="col-total">TOTAL</th>
+                                    <th class="col-quant"><i class="fas fa-hashtag"></i> QUANT.</th>
+                                    <th class="col-desc"><i class="fas fa-align-left"></i> DESCRIÇÃO</th>
+                                    <th class="col-preco"><i class="fas fa-dollar-sign"></i> PREÇO UNT.</th>
+                                    <th class="col-total"><i class="fas fa-calculator"></i> TOTAL</th>
                                 </tr>
                             </thead>
                             <tbody id="items-body">
@@ -309,19 +153,23 @@
                     <div class="footer-section">
                         <div class="footer-left">
                             <div class="footer-row">
-                                <span class="label">PRAZO</span>
-                                <input type="checkbox" id="prazo-15" onchange="saveDraft()"> <span class="label">15 DIAS</span>
-                                <input type="checkbox" id="prazo-30" onchange="saveDraft()"> <span class="label">30 DIAS</span>
+                                <span class="label"><i class="fas fa-clock"></i> PRAZO</span>
+                                <input type="checkbox" id="prazo-15" onchange="saveDraft()"> 
+                                <span class="label">15 DIAS</span>
+                                <input type="checkbox" id="prazo-30" onchange="saveDraft()"> 
+                                <span class="label">30 DIAS</span>
                             </div>
                             <div class="footer-row">
-                                <span class="label">CHEQUE VALOR R$</span><input type="text" id="val-cheque" oninput="saveDraft()">
+                                <span class="label"><i class="fas fa-money-check"></i> CHEQUE VALOR R$</span>
+                                <input type="text" id="val-cheque" oninput="saveDraft()">
                             </div>
                             <div class="footer-row">
-                                <span class="label">SINAL R$</span><input type="text" id="val-sinal" oninput="saveDraft()">
+                                <span class="label"><i class="fas fa-hand-holding-usd"></i> SINAL R$</span>
+                                <input type="text" id="val-sinal" oninput="saveDraft()">
                             </div>
                         </div>
                         <div class="footer-right">
-                            <span class="total-label">TOTAL R$:</span>
+                            <span class="total-label"><i class="fas fa-calculator"></i> TOTAL R$:</span>
                             <div class="total-value" id="total-geral"></div>
                         </div>
                     </div>
@@ -332,21 +180,115 @@
     </main>
 
     <script>
+        // ============================================================
+        // DETECÇÃO DE DISPOSITIVO E CARGA DE CSS PERSONALIZADO
+        // ============================================================
+        async function carregarCssPorDispositivo() {
+            const uaString = navigator.userAgent.toLowerCase();
+            let arquivoCss = "default.css";
+            const pastaCss = "./css/";
+
+            if (navigator.userAgentData) {
+                try {
+                    const ua = await navigator.userAgentData.getHighEntropyValues(['platformVersion', 'model']);
+                    const plataforma = navigator.userAgentData.platform.toLowerCase();
+                    const modelo = ua.model ? ua.model.toLowerCase() : "";
+
+                    if (plataforma === "windows") {
+                        const buildWindows = parseInt(ua.platformVersion.split('.'));
+                        if (buildWindows >= 14) arquivoCss = "win11.css";
+                        else if (buildWindows > 0) arquivoCss = "win10.css";
+                        else arquivoCss = checarFallbackWindows(uaString);
+                        injetarEstilo(pastaCss + arquivoCss);
+                        return;
+                    }
+
+                    if (plataforma === "android" || uaString.includes("android")) {
+                        arquivoCss = classificarMarcaAndroid(modelo, uaString);
+                        injetarEstilo(pastaCss + arquivoCss);
+                        return;
+                    }
+                } catch (e) { /* fallback */ }
+            }
+
+            if (uaString.includes("macintosh") && !navigator.maxTouchPoints) {
+                const matchMac = uaString.match(/mac os x (\d+)[_.](\d+)/);
+                if (matchMac) {
+                    const versaoPrincipal = parseInt(matchMac[1]);
+                    arquivoCss = `macos${versaoPrincipal}.css`;
+                } else {
+                    arquivoCss = "macos-generico.css";
+                }
+                injetarEstilo(pastaCss + arquivoCss);
+                return;
+            }
+
+            const éiPad = uaString.includes("ipad") || (uaString.includes("macintosh") && navigator.maxTouchPoints > 1);
+            const éiPhone = uaString.includes("iphone");
+
+            if (éiPhone || éiPad) {
+                const dispositivo = éiPhone ? "ios" : "ipados";
+                const matchApple = uaString.match(/os (\d+)_/);
+                if (matchApple) {
+                    const versaoOS = parseInt(matchApple[1]);
+                    arquivoCss = `${dispositivo}${versaoOS}.css`;
+                } else {
+                    arquivoCss = `${dispositivo}-generico.css`;
+                }
+                injetarEstilo(pastaCss + arquivoCss);
+                return;
+            }
+
+            if (uaString.includes("android")) {
+                arquivoCss = classificarMarcaAndroid("", uaString);
+            } else {
+                arquivoCss = checarFallbackWindows(uaString);
+            }
+            injetarEstilo(pastaCss + arquivoCss);
+        }
+
+        function checarFallbackWindows(uaString) {
+            if (uaString.includes("windows nt 10.0")) return "win10.css";
+            if (uaString.includes("windows nt 6.1")) return "win7.css";
+            return "default.css";
+        }
+
+        function classificarMarcaAndroid(modelo, uaString) {
+            const texto = (modelo + " " + uaString).toLowerCase();
+            if (texto.includes("samsung") || texto.includes("sm-") || texto.includes("sec-")) return "samsung.css";
+            if (texto.includes("pixel") || texto.includes("nexus")) return "pixel.css";
+            if (texto.includes("xiaomi") || texto.includes("redmi") || texto.includes("poco") || texto.includes("mi ")) return "xiaomi.css";
+            return "android-generico.css";
+        }
+
+        function injetarEstilo(caminhoCompleto) {
+            const link = document.createElement("link");
+            link.rel = "stylesheet";
+            link.type = "text/css";
+            link.href = caminhoCompleto;
+            document.getElementsByTagName("head")[0].appendChild(link);
+        }
+
+        // Inicializa a carga imediatamente
+        carregarCssPorDispositivo();
+
+        // ============================================================
+        // LÓGICA PRINCIPAL DO PEDIDO
+        // ============================================================
         const tbody = document.getElementById('items-body');
         const MIN_ROWS = 15;
-        let activeOrderId = null; 
+        let activeOrderId = null;
 
-        // --- SISTEMA DE UI ---
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
         }
+
         function closeSidebarMobile() {
             if(window.innerWidth <= 768) {
                 document.getElementById('sidebar').classList.remove('active');
             }
         }
 
-        // --- UTILITÁRIOS DE MATEMÁTICA ---
         const formatMoney = (value) => {
             if(isNaN(value) || value === '') return '';
             return parseFloat(value).toFixed(2).replace('.', ',');
@@ -357,7 +299,6 @@
             return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
         }
 
-        // --- LÓGICA DA TABELA ---
         function addRow(data = {q: '', d: '', p: '', t: ''}) {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -393,7 +334,6 @@
             const allRows = tbody.querySelectorAll('tr');
             const lastRow = allRows[allRows.length - 1];
             
-            // REMOVIDO O LIMITE: Agora adiciona linha infinitamente se a última for preenchida
             if (currentRow === lastRow) {
                 let hasContent = Array.from(lastRow.querySelectorAll('input')).some(inp => inp.value.trim() !== '');
                 if (hasContent) addRow(); 
@@ -554,59 +494,204 @@
                 div.onclick = () => loadOrder(order.id);
                 
                 div.innerHTML = `
-                    <span title="${order.name}">${order.name}</span>
-                    <button class="delete-btn" onclick="deleteOrder('${order.id}', event)">X</button>
+                    <span><i class="fas fa-file-alt"></i> ${order.name}</span>
+                    <button class="delete-btn" onclick="deleteOrder('${order.id}', event)">
+                        <i class="fas fa-times"></i>
+                    </button>
                 `;
                 listDiv.appendChild(div);
             });
         }
 
-        // --- GERADOR DE PDF ---
-        function gerarPDF() {
-    const element = document.getElementById('folha-pedido');
-    const nomeCli = document.getElementById('cli-nome').value || 'Avulso';
-    
-    document.querySelectorAll('input').forEach(inp => {
-        if(inp.type === 'checkbox') {
-            if(inp.checked) inp.setAttribute('checked', 'checked');
-            else inp.removeAttribute('checked');
-        } else {
-            inp.setAttribute('value', inp.value);
+        function exportarExcel() {
+            const data = gatherData();
+            
+            const rows = [];
+            rows.push(['WinPedidos 7 - Pedido de Venda']);
+            rows.push([]);
+            rows.push(['PEDIDO Nº', data.pedido || '']);
+            rows.push(['DATA', `${data.dataD}/${data.dataM}/${data.dataA}`]);
+            rows.push([]);
+            rows.push(['DADOS DO CLIENTE']);
+            rows.push(['NOME', data.cliente.nome || '']);
+            rows.push(['TEL', data.cliente.tel || '']);
+            rows.push(['ENDEREÇO', data.cliente.end || '']);
+            rows.push(['BAIRRO', data.cliente.bairro || '']);
+            rows.push(['MUNICIPIO', data.cliente.mun || '']);
+            rows.push(['UF', data.cliente.uf || '']);
+            rows.push(['CEP', data.cliente.cep || '']);
+            rows.push(['CNPJ/CPF', data.cliente.doc || '']);
+            rows.push(['INSC.ESTADUAL', data.cliente.ie || '']);
+            rows.push([]);
+            rows.push(['QUANT.', 'DESCRIÇÃO', 'PREÇO UNT.', 'TOTAL']);
+            
+            let totalGeral = 0;
+            data.itens.forEach(item => {
+                const t = parseMoney(item.t);
+                totalGeral += t;
+                rows.push([
+                    item.q || '0',
+                    item.d || '',
+                    item.p || '0,00',
+                    item.t || '0,00'
+                ]);
+            });
+            
+            rows.push([]);
+            rows.push(['PRAZO 15 DIAS', data.rodape.p15 ? 'SIM' : 'NÃO']);
+            rows.push(['PRAZO 30 DIAS', data.rodape.p30 ? 'SIM' : 'NÃO']);
+            rows.push(['CHEQUE VALOR R$', data.rodape.cheque || '']);
+            rows.push(['SINAL R$', data.rodape.sinal || '']);
+            rows.push([]);
+            rows.push(['TOTAL GERAL R$', formatMoney(totalGeral) || '0,00']);
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(rows);
+            ws['!cols'] = [{ wch: 22 }, { wch: 45 }, { wch: 15 }, { wch: 15 }];
+            XLSX.utils.book_append_sheet(wb, ws, 'Pedido');
+            
+            const nomeArquivo = `WinPedidos7_${data.cliente.nome || 'Avulso'}.xlsx`;
+            XLSX.writeFile(wb, nomeArquivo);
         }
-    });
 
-    element.classList.add('pdf-mode');
+        function gerarPDFAltaQualidade() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('active');
+            overlay.querySelector('.loading-text').textContent = 'Gerando PDF em 300 DPI...';
+            
+            setTimeout(() => {
+                const element = document.getElementById('folha-pedido');
+                const nomeCli = document.getElementById('cli-nome').value || 'Avulso';
+                
+                document.querySelectorAll('input').forEach(inp => {
+                    if(inp.type === 'checkbox') {
+                        if(inp.checked) inp.setAttribute('checked', 'checked');
+                        else inp.removeAttribute('checked');
+                    } else {
+                        inp.setAttribute('value', inp.value);
+                    }
+                });
 
-    // Força layout antes de capturar
-    const larguraReal = element.scrollWidth;
-    const alturaReal = element.scrollHeight;
+                element.classList.add('pdf-mode');
+                void element.offsetHeight;
 
-    const opt = {
-        margin:       0,
-        filename:     `Pedido_${nomeCli}.pdf`,
-        image:        { type: 'jpeg', quality: 1 },
-        pagebreak:    { mode: ['css', 'legacy'], avoid: 'tr' },
-        html2canvas:  { 
-            scale: 2, 
-            width: larguraReal,
-            height: alturaReal,
-            windowWidth: larguraReal,
-            windowHeight: alturaReal,
-            scrollX: 0,
-            scrollY: 0,
-            useCORS: true
-        },
-        jsPDF:        { 
-            unit: 'mm', 
-            format: 'a4', 
-            orientation: 'portrait' 
+                const opt = {
+                    margin: 0,
+                    filename: `WinPedidos7_300DPI_${nomeCli}.pdf`,
+                    image: { type: 'jpeg', quality: 1 },
+                    html2canvas: { 
+                        scale: 3.0,
+                        useCORS: true,
+                        logging: false,
+                        width: 2480,
+                        height: 3508,
+                        windowWidth: 2480,
+                        windowHeight: 3508,
+                        scrollX: 0,
+                        scrollY: 0,
+                        x: 0,
+                        y: 0,
+                        onclone: function(doc) {
+                            doc.body.style.overflow = 'visible';
+                            doc.body.style.zoom = '1';
+                        }
+                    },
+                    jsPDF: { 
+                        unit: 'px', 
+                        format: [2480, 3508],
+                        orientation: 'portrait',
+                        compress: true,
+                        precision: 16
+                    }
+                };
+
+                html2pdf()
+                    .set(opt)
+                    .from(element)
+                    .save()
+                    .then(() => {
+                        element.classList.remove('pdf-mode');
+                        overlay.classList.remove('active');
+                        overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
+                    })
+                    .catch((err) => {
+                        console.error('Erro ao gerar PDF:', err);
+                        element.classList.remove('pdf-mode');
+                        overlay.classList.remove('active');
+                        alert('Erro ao gerar PDF. Tente novamente.');
+                        overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
+                    });
+            }, 500);
         }
-    };
 
-    html2pdf().set(opt).from(element).save().then(() => {
-        element.classList.remove('pdf-mode');
-    });
-}
+        function gerarPDFBaixaQualidade() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('active');
+            overlay.querySelector('.loading-text').textContent = 'Gerando PDF para visualização (72 DPI)...';
+            
+            setTimeout(() => {
+                const element = document.getElementById('folha-pedido');
+                const nomeCli = document.getElementById('cli-nome').value || 'Avulso';
+                
+                document.querySelectorAll('input').forEach(inp => {
+                    if(inp.type === 'checkbox') {
+                        if(inp.checked) inp.setAttribute('checked', 'checked');
+                        else inp.removeAttribute('checked');
+                    } else {
+                        inp.setAttribute('value', inp.value);
+                    }
+                });
+
+                element.classList.add('pdf-mode');
+                void element.offsetHeight;
+
+                const opt = {
+                    margin: 0,
+                    filename: `WinPedidos7_72DPI_${nomeCli}.pdf`,
+                    image: { type: 'jpeg', quality: 0.8 },
+                    html2canvas: { 
+                        scale: 0.72,
+                        useCORS: true,
+                        logging: false,
+                        width: 595,
+                        height: 842,
+                        windowWidth: 595,
+                        windowHeight: 842,
+                        scrollX: 0,
+                        scrollY: 0,
+                        x: 0,
+                        y: 0,
+                        onclone: function(doc) {
+                            doc.body.style.overflow = 'visible';
+                            doc.body.style.zoom = '0.72';
+                        }
+                    },
+                    jsPDF: { 
+                        unit: 'px', 
+                        format: [595, 842],
+                        orientation: 'portrait',
+                        compress: true
+                    }
+                };
+
+                html2pdf()
+                    .set(opt)
+                    .from(element)
+                    .save()
+                    .then(() => {
+                        element.classList.remove('pdf-mode');
+                        overlay.classList.remove('active');
+                        overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
+                    })
+                    .catch((err) => {
+                        console.error('Erro ao gerar PDF:', err);
+                        element.classList.remove('pdf-mode');
+                        overlay.classList.remove('active');
+                        alert('Erro ao gerar PDF. Tente novamente.');
+                        overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
+                    });
+            }, 500);
+        }
 
         window.onload = () => {
             renderSidebarList();
@@ -617,7 +702,6 @@
                 populateData({});
             }
         };
-
     </script>
 </body>
 </html>
