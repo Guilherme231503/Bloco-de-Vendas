@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WinPedidos 7 - Gerenciador de Pedidos</title>
+    <title>Pedidos - Gerenciador de Pedidos</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Biblioteca para gerar PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <!-- Biblioteca para gerar Excel -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
+    <!-- Biblioteca para gerar PNG -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 </head>
 <body>
 
@@ -57,8 +57,8 @@
                 <button class="btn" onclick="gerarPDFBaixaQualidade()">
                     <i class="fas fa-file-pdf"></i> PDF 72 DPI
                 </button>
-                <button class="btn" onclick="exportarExcel()" style="background:linear-gradient(180deg,#1d7a3d 0%,#1a6a30 100%);border-color:#0a4a1a;color:white;">
-                    <i class="fas fa-file-excel"></i> Excel
+                <button class="btn" onclick="gerarPNG()">
+                    <i class="fas fa-file-image"></i> PNG
                 </button>
             </div>
         </div>
@@ -67,7 +67,7 @@
         <div class="paper-container" onclick="closeSidebarMobile()">
             <div class="page" id="folha-pedido">
                 <div class="border-box">
-                    
+
                     <!-- Cabeçalho -->
                     <div class="header-section">
                         <div class="pedido-box">
@@ -77,9 +77,9 @@
                         <div class="data-box">
                             <span class="label">DATA</span>
                             <div class="data-inputs">
-                                <input type="text" id="data-d" maxlength="2" oninput="saveDraft()"> 
+                                <input type="text" id="data-d" maxlength="2" oninput="saveDraft()">
                                 <span>/</span>
-                                <input type="text" id="data-m" maxlength="2" oninput="saveDraft()"> 
+                                <input type="text" id="data-m" maxlength="2" oninput="saveDraft()">
                                 <span>/</span>
                                 <input type="text" id="data-a" maxlength="4" oninput="saveDraft()">
                             </div>
@@ -121,16 +121,6 @@
                             <input type="text" id="cli-cep" oninput="saveDraft()">
                         </div>
                     </div>
-                    <div class="flex-row">
-                        <div class="col" style="width: 55%;">
-                            <span class="label"><i class="fas fa-id-card" style="margin-right:4px;"></i>CNPJ/CPF</span>
-                            <input type="text" id="cli-doc" oninput="saveDraft()">
-                        </div>
-                        <div class="col" style="width: 45%;">
-                            <span class="label">INSC.ESTADUAL</span>
-                            <input type="text" id="cli-ie" oninput="saveDraft()">
-                        </div>
-                    </div>
 
                     <!-- Tabela de Itens -->
                     <div class="items-section">
@@ -151,26 +141,10 @@
 
                     <!-- Rodapé -->
                     <div class="footer-section">
-                        <div class="footer-left">
-                            <div class="footer-row">
-                                <span class="label"><i class="fas fa-clock"></i> PRAZO</span>
-                                <input type="checkbox" id="prazo-15" onchange="saveDraft()"> 
-                                <span class="label">15 DIAS</span>
-                                <input type="checkbox" id="prazo-30" onchange="saveDraft()"> 
-                                <span class="label">30 DIAS</span>
-                            </div>
-                            <div class="footer-row">
-                                <span class="label"><i class="fas fa-money-check"></i> CHEQUE VALOR R$</span>
-                                <input type="text" id="val-cheque" oninput="saveDraft()">
-                            </div>
-                            <div class="footer-row">
-                                <span class="label"><i class="fas fa-hand-holding-usd"></i> SINAL R$</span>
-                                <input type="text" id="val-sinal" oninput="saveDraft()">
-                            </div>
-                        </div>
+                        <div class="footer-left"></div>
                         <div class="footer-right">
                             <span class="total-label"><i class="fas fa-calculator"></i> TOTAL R$:</span>
-                            <div class="total-value" id="total-geral"></div>
+                            <div class="total-value" id="total-geral">R$ 0,00</div>
                         </div>
                     </div>
 
@@ -179,9 +153,86 @@
         </div>
     </main>
 
+    <style>
+        /* ============================================================
+           Apenas o necessário para a ANIMAÇÃO dos números e para a
+           responsividade Android — não altera nenhuma cor, fonte,
+           layout de papel ou variáveis do CSS dinâmico já carregado.
+        ============================================================ */
+
+        /* --- Efeito de "número rolando com blur" (estilo app financeiro) --- */
+        .total-value {
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+        }
+        .total-value .num-roll {
+            display: inline-block;
+            animation: numRollIn 0.38s cubic-bezier(.22,.68,.36,1);
+            filter: blur(0);
+        }
+        @keyframes numRollIn {
+            0%   { transform: translateY(45%); opacity: 0; filter: blur(6px); }
+            60%  { opacity: 1; }
+            100% { transform: translateY(0);   opacity: 1; filter: blur(0); }
+        }
+        .item-t.pulsing {
+            animation: fieldPulse 0.35s ease;
+        }
+        @keyframes fieldPulse {
+            0%   { filter: blur(3px); opacity: .5; }
+            100% { filter: blur(0);   opacity: 1; }
+        }
+
+        /* --- Responsividade extra para Android/telas pequenas ---
+           Só ajusta espaçamentos/quebras, sem redefinir cores/fontes. */
+        @media (max-width: 480px) {
+            .topbar-actions {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            .topbar-actions .btn {
+                flex: 1 1 auto;
+                min-width: 0;
+                font-size: 0.82em;
+                padding: 8px 6px;
+                justify-content: center;
+            }
+            .topbar-actions .btn i { margin-right: 4px; }
+
+            .flex-row { flex-wrap: wrap; }
+            .flex-row .col { width: 100% !important; margin-bottom: 6px; }
+
+            .header-section { flex-wrap: wrap; gap: 8px; }
+            .pedido-box, .data-box { width: 100%; }
+
+            table, thead, tbody, th, td, tr { display: block; width: 100%; }
+            .items-section table thead { display: none; }
+            .items-section table tbody tr {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 4px 8px;
+                margin-bottom: 8px;
+            }
+            .col-desc { grid-column: 1 / -1; }
+            .col-quant::before   { content: "Quant."; display:block; font-size:.7em; opacity:.65; }
+            .col-desc::before    { content: "Descrição"; display:block; font-size:.7em; opacity:.65; }
+            .col-preco::before   { content: "Preço Unt."; display:block; font-size:.7em; opacity:.65; }
+            .col-total::before   { content: "Total"; display:block; font-size:.7em; opacity:.65; }
+
+            .footer-section { flex-direction: column; align-items: stretch; gap: 10px; }
+            .footer-right { justify-content: space-between; }
+        }
+
+        @media (max-width: 480px) and (orientation: portrait) {
+            .paper-container { padding: 6px; }
+        }
+    </style>
+
     <script>
         // ============================================================
         // DETECÇÃO DE DISPOSITIVO E CARGA DE CSS PERSONALIZADO
+        // (inalterado — CSS dinâmico permanece como está)
         // ============================================================
         async function carregarCssPorDispositivo() {
             const uaString = navigator.userAgent.toLowerCase();
@@ -289,31 +340,94 @@
             }
         }
 
-        const formatMoney = (value) => {
-            if(isNaN(value) || value === '') return '';
-            return parseFloat(value).toFixed(2).replace('.', ',');
+        // ------------------------------------------------------------
+        // FORMATAÇÃO DE MOEDA — CORRIGIDA
+        // Antes: parseMoney fazia replace(/\./g,'') em QUALQUER texto,
+        // então digitar "70" (inteiro) virava "70", mas ao formatar o
+        // total com toFixed(2) e trocar ponto por vírgula, um valor já
+        // formatado (ex: "9.999,99") era relido e o ponto de milhar
+        // era removido incorretamente em cascata, gerando totais
+        // absurdos como 70 x 30 = "210.000" em vez de "2.100,00".
+        // Agora os valores são guardados sempre como NÚMERO (float)
+        // internamente, e só formatados para exibição — nunca
+        // reprocessados a partir de uma string já formatada.
+        // ------------------------------------------------------------
+
+        // Converte string digitada (podendo ter . de milhar e , decimal) em número
+        function parseMoney(str) {
+            if (str === null || str === undefined || str === '') return 0;
+            str = String(str).trim();
+            // remove tudo que não é dígito, ponto, vírgula ou sinal
+            str = str.replace(/[^\d.,-]/g, '');
+            if (str === '') return 0;
+
+            const temVirgula = str.includes(',');
+            const temPonto = str.includes('.');
+
+            if (temVirgula && temPonto) {
+                // formato 9.999,99 -> ponto é milhar, vírgula é decimal
+                str = str.replace(/\./g, '').replace(',', '.');
+            } else if (temVirgula) {
+                // formato 9999,99 -> vírgula é decimal
+                str = str.replace(',', '.');
+            } else if (temPonto) {
+                // Só ponto: se houver mais de 2 dígitos após o único ponto
+                // e o ponto não estiver a exatamente 3 dígitos do fim seguido
+                // de outro grupo, tratamos como decimal (ex: "70.5"); mas se
+                // parecer separador de milhar (ex: "1.234"), tratamos como milhar.
+                const partes = str.split('.');
+                if (partes.length === 2 && partes[1].length === 3 && partes[0].length <= 3) {
+                    // ambíguo tipo "1.234" — assume milhar (padrão BR)
+                    str = str.replace('.', '');
+                }
+                // senão mantém o ponto como decimal (ex: "70.50")
+            }
+            const n = parseFloat(str);
+            return isNaN(n) ? 0 : n;
         }
 
-        const parseMoney = (str) => {
-            if(!str) return 0;
-            return parseFloat(str.replace(/\./g, '').replace(',', '.')) || 0;
+        // Formata número para exibição: R$ 9.999,99
+        function formatMoneyDisplay(value, comPrefixo = false) {
+            const n = isNaN(value) ? 0 : Number(value);
+            const formatado = n.toLocaleString('pt-BR', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            return comPrefixo ? `R$ ${formatado}` : formatado;
+        }
+
+        // Formata apenas para os campos de input (sem R$, ex: 9.999,99)
+        function formatMoney(value) {
+            return formatMoneyDisplay(value, false);
         }
 
         function addRow(data = {q: '', d: '', p: '', t: ''}) {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="col-quant"><input type="text" class="item-q" value="${data.q}"></td>
+                <td class="col-quant"><input type="text" inputmode="decimal" class="item-q" value="${data.q}"></td>
                 <td class="col-desc"><input type="text" class="item-d" value="${data.d}"></td>
-                <td class="col-preco"><input type="text" class="item-p" value="${data.p}"></td>
-                <td class="col-total"><input type="text" class="item-t" value="${data.t}"></td>
+                <td class="col-preco"><input type="text" inputmode="decimal" class="item-p" value="${data.p}"></td>
+                <td class="col-total"><input type="text" class="item-t" value="${data.t}" readonly></td>
             `;
 
-            tr.querySelectorAll('input').forEach(input => {
-                input.addEventListener('input', () => {
+            const qInput = tr.querySelector('.item-q');
+            const pInput = tr.querySelector('.item-p');
+            const dInput = tr.querySelector('.item-d');
+
+            // Cálculo em tempo real a cada tecla digitada (input), não só ao sair do campo
+            [qInput, pInput, dInput].forEach(inp => {
+                inp.addEventListener('input', () => {
                     handleInput(tr);
                     saveDraft();
                 });
             });
+
+            // Ao perder o foco, formata o preço unitário bonito (9.999,99)
+            pInput.addEventListener('blur', () => {
+                const v = parseMoney(pInput.value);
+                pInput.value = v > 0 ? formatMoney(v) : pInput.value;
+            });
+
             tbody.appendChild(tr);
         }
 
@@ -324,19 +438,23 @@
 
             const q = parseMoney(qInput.value);
             const p = parseMoney(pInput.value);
-            
-            if(q > 0 && p > 0 && !isNaN(q) && !isNaN(p)) {
-                tInput.value = formatMoney(q * p);
-            } else if (qInput.value === '' || pInput.value === '') {
+
+            if (q > 0 && p > 0) {
+                const totalLinha = q * p;
+                tInput.value = formatMoney(totalLinha);
+                tInput.classList.remove('pulsing');
+                void tInput.offsetWidth; // reinicia animação
+                tInput.classList.add('pulsing');
+            } else {
                 tInput.value = '';
             }
 
             const allRows = tbody.querySelectorAll('tr');
             const lastRow = allRows[allRows.length - 1];
-            
+
             if (currentRow === lastRow) {
                 let hasContent = Array.from(lastRow.querySelectorAll('input')).some(inp => inp.value.trim() !== '');
-                if (hasContent) addRow(); 
+                if (hasContent) addRow();
             }
 
             calculateGrandTotal();
@@ -347,8 +465,19 @@
             document.querySelectorAll('.item-t').forEach(input => {
                 total += parseMoney(input.value);
             });
+            renderTotalComAnimacao(total);
+        }
+
+        // Animação estilo "app financeiro": números sobem com leve blur
+        let ultimoTotalExibido = null;
+        function renderTotalComAnimacao(total) {
             const totalDiv = document.getElementById('total-geral');
-            totalDiv.innerText = total > 0 ? formatMoney(total) : '';
+            const textoFinal = `R$ ${formatMoney(total)}`;
+
+            if (ultimoTotalExibido === textoFinal) return; // evita re-render sem mudança
+            ultimoTotalExibido = textoFinal;
+
+            totalDiv.innerHTML = `<span class="num-roll">${textoFinal}</span>`;
         }
 
         function gatherData() {
@@ -365,14 +494,6 @@
                     mun: document.getElementById('cli-mun').value,
                     uf: document.getElementById('cli-uf').value,
                     cep: document.getElementById('cli-cep').value,
-                    doc: document.getElementById('cli-doc').value,
-                    ie: document.getElementById('cli-ie').value,
-                },
-                rodape: {
-                    p15: document.getElementById('prazo-15').checked,
-                    p30: document.getElementById('prazo-30').checked,
-                    cheque: document.getElementById('val-cheque').value,
-                    sinal: document.getElementById('val-sinal').value
                 },
                 itens: []
             };
@@ -392,7 +513,7 @@
             document.getElementById('data-d').value = data.dataD || '';
             document.getElementById('data-m').value = data.dataM || '';
             document.getElementById('data-a').value = data.dataA || '';
-            
+
             document.getElementById('cli-nome').value = data.cliente?.nome || '';
             document.getElementById('cli-tel').value = data.cliente?.tel || '';
             document.getElementById('cli-end').value = data.cliente?.end || '';
@@ -400,23 +521,17 @@
             document.getElementById('cli-mun').value = data.cliente?.mun || '';
             document.getElementById('cli-uf').value = data.cliente?.uf || '';
             document.getElementById('cli-cep').value = data.cliente?.cep || '';
-            document.getElementById('cli-doc').value = data.cliente?.doc || '';
-            document.getElementById('cli-ie').value = data.cliente?.ie || '';
 
-            document.getElementById('prazo-15').checked = data.rodape?.p15 || false;
-            document.getElementById('prazo-30').checked = data.rodape?.p30 || false;
-            document.getElementById('val-cheque').value = data.rodape?.cheque || '';
-            document.getElementById('val-sinal').value = data.rodape?.sinal || '';
-
-            tbody.innerHTML = ''; 
+            tbody.innerHTML = '';
             if(data.itens && data.itens.length > 0) {
                 data.itens.forEach(item => addRow(item));
             }
-            
+
             const currentRows = tbody.querySelectorAll('tr').length;
             for(let i = currentRows; i < MIN_ROWS; i++) addRow();
-            addRow(); 
+            addRow();
 
+            ultimoTotalExibido = null;
             calculateGrandTotal();
         }
 
@@ -427,12 +542,12 @@
         function salvarPedidoNomeado() {
             let nomeCliente = document.getElementById('cli-nome').value;
             let nomePadrao = nomeCliente ? `Pedido - ${nomeCliente}` : "Novo Pedido";
-            
+
             let nome = prompt("Dê um nome para salvar este pedido:", nomePadrao);
-            if (!nome) return; 
+            if (!nome) return;
 
             let savedOrders = JSON.parse(localStorage.getItem('pedidos_lista') || '[]');
-            
+
             if(activeOrderId) {
                 let index = savedOrders.findIndex(o => o.id === activeOrderId);
                 if(index > -1) {
@@ -459,7 +574,7 @@
             if(order) {
                 activeOrderId = order.id;
                 populateData(order.data);
-                saveDraft(); 
+                saveDraft();
                 closeSidebarMobile();
             }
         }
@@ -470,7 +585,7 @@
                 let savedOrders = JSON.parse(localStorage.getItem('pedidos_lista') || '[]');
                 savedOrders = savedOrders.filter(o => o.id !== id);
                 localStorage.setItem('pedidos_lista', JSON.stringify(savedOrders));
-                
+
                 if(activeOrderId === id) novoPedido();
                 renderSidebarList();
             }
@@ -487,12 +602,12 @@
             const listDiv = document.getElementById('order-list');
             listDiv.innerHTML = '';
             let savedOrders = JSON.parse(localStorage.getItem('pedidos_lista') || '[]');
-            
+
             savedOrders.forEach(order => {
                 const div = document.createElement('div');
                 div.className = 'order-item';
                 div.onclick = () => loadOrder(order.id);
-                
+
                 div.innerHTML = `
                     <span><i class="fas fa-file-alt"></i> ${order.name}</span>
                     <button class="delete-btn" onclick="deleteOrder('${order.id}', event)">
@@ -503,194 +618,131 @@
             });
         }
 
-        function exportarExcel() {
-            const data = gatherData();
-            
-            const rows = [];
-            rows.push(['WinPedidos 7 - Pedido de Venda']);
-            rows.push([]);
-            rows.push(['PEDIDO Nº', data.pedido || '']);
-            rows.push(['DATA', `${data.dataD}/${data.dataM}/${data.dataA}`]);
-            rows.push([]);
-            rows.push(['DADOS DO CLIENTE']);
-            rows.push(['NOME', data.cliente.nome || '']);
-            rows.push(['TEL', data.cliente.tel || '']);
-            rows.push(['ENDEREÇO', data.cliente.end || '']);
-            rows.push(['BAIRRO', data.cliente.bairro || '']);
-            rows.push(['MUNICIPIO', data.cliente.mun || '']);
-            rows.push(['UF', data.cliente.uf || '']);
-            rows.push(['CEP', data.cliente.cep || '']);
-            rows.push(['CNPJ/CPF', data.cliente.doc || '']);
-            rows.push(['INSC.ESTADUAL', data.cliente.ie || '']);
-            rows.push([]);
-            rows.push(['QUANT.', 'DESCRIÇÃO', 'PREÇO UNT.', 'TOTAL']);
-            
-            let totalGeral = 0;
-            data.itens.forEach(item => {
-                const t = parseMoney(item.t);
-                totalGeral += t;
-                rows.push([
-                    item.q || '0',
-                    item.d || '',
-                    item.p || '0,00',
-                    item.t || '0,00'
-                ]);
+        // ------------------------------------------------------------
+        // GERAÇÃO DE PDF — CORRIGIDA
+        // Problema anterior: forçar width/height/windowWidth fixos em
+        // pixels (2480x3508 / 595x842) junto com scale, fazia o
+        // html2canvas capturar a página fora do tamanho real do
+        // elemento, gerando corte/distorção ("PDF mal formado").
+        // Agora deixamos o html2canvas medir o elemento real e
+        // controlamos a qualidade só pelo "scale", com formato de
+        // página A4 correto no jsPDF.
+        // ------------------------------------------------------------
+        function prepararCamposParaExport() {
+            document.querySelectorAll('input').forEach(inp => {
+                if (inp.type === 'checkbox') {
+                    if (inp.checked) inp.setAttribute('checked', 'checked');
+                    else inp.removeAttribute('checked');
+                } else {
+                    inp.setAttribute('value', inp.value);
+                }
             });
-            
-            rows.push([]);
-            rows.push(['PRAZO 15 DIAS', data.rodape.p15 ? 'SIM' : 'NÃO']);
-            rows.push(['PRAZO 30 DIAS', data.rodape.p30 ? 'SIM' : 'NÃO']);
-            rows.push(['CHEQUE VALOR R$', data.rodape.cheque || '']);
-            rows.push(['SINAL R$', data.rodape.sinal || '']);
-            rows.push([]);
-            rows.push(['TOTAL GERAL R$', formatMoney(totalGeral) || '0,00']);
+        }
 
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet(rows);
-            ws['!cols'] = [{ wch: 22 }, { wch: 45 }, { wch: 15 }, { wch: 15 }];
-            XLSX.utils.book_append_sheet(wb, ws, 'Pedido');
-            
-            const nomeArquivo = `WinPedidos7_${data.cliente.nome || 'Avulso'}.xlsx`;
-            XLSX.writeFile(wb, nomeArquivo);
+        function gerarPDF(scale, sufixo, qualidadeImagem, textoCarregando) {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('active');
+            overlay.querySelector('.loading-text').textContent = textoCarregando;
+
+            setTimeout(() => {
+                const element = document.getElementById('folha-pedido');
+                const nomeCli = (document.getElementById('cli-nome').value || 'Avulso').trim();
+
+                prepararCamposParaExport();
+
+                element.classList.add('pdf-mode');
+                void element.offsetHeight;
+
+                const opt = {
+                    margin: 0,
+                    filename: `WinPedidos7_${sufixo}_${nomeCli}.pdf`,
+                    image: { type: 'jpeg', quality: qualidadeImagem },
+                    html2canvas: {
+                        scale: scale,
+                        useCORS: true,
+                        logging: false,
+                        scrollX: 0,
+                        scrollY: 0,
+                        onclone: function(doc) {
+                            doc.body.style.overflow = 'visible';
+                        }
+                    },
+                    jsPDF: {
+                        unit: 'mm',
+                        format: 'a4',
+                        orientation: 'portrait',
+                        compress: true
+                    },
+                    pagebreak: { mode: ['avoid-all'] }
+                };
+
+                html2pdf()
+                    .set(opt)
+                    .from(element)
+                    .save()
+                    .then(() => {
+                        element.classList.remove('pdf-mode');
+                        overlay.classList.remove('active');
+                        overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
+                    })
+                    .catch((err) => {
+                        console.error('Erro ao gerar PDF:', err);
+                        element.classList.remove('pdf-mode');
+                        overlay.classList.remove('active');
+                        alert('Erro ao gerar PDF. Tente novamente.');
+                        overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
+                    });
+            }, 300);
         }
 
         function gerarPDFAltaQualidade() {
-            const overlay = document.getElementById('loadingOverlay');
-            overlay.classList.add('active');
-            overlay.querySelector('.loading-text').textContent = 'Gerando PDF em 300 DPI...';
-            
-            setTimeout(() => {
-                const element = document.getElementById('folha-pedido');
-                const nomeCli = document.getElementById('cli-nome').value || 'Avulso';
-                
-                document.querySelectorAll('input').forEach(inp => {
-                    if(inp.type === 'checkbox') {
-                        if(inp.checked) inp.setAttribute('checked', 'checked');
-                        else inp.removeAttribute('checked');
-                    } else {
-                        inp.setAttribute('value', inp.value);
-                    }
-                });
-
-                element.classList.add('pdf-mode');
-                void element.offsetHeight;
-
-                const opt = {
-                    margin: 0,
-                    filename: `WinPedidos7_300DPI_${nomeCli}.pdf`,
-                    image: { type: 'jpeg', quality: 1 },
-                    html2canvas: { 
-                        scale: 3.0,
-                        useCORS: true,
-                        logging: false,
-                        width: 2480,
-                        height: 3508,
-                        windowWidth: 2480,
-                        windowHeight: 3508,
-                        scrollX: 0,
-                        scrollY: 0,
-                        x: 0,
-                        y: 0,
-                        onclone: function(doc) {
-                            doc.body.style.overflow = 'visible';
-                            doc.body.style.zoom = '1';
-                        }
-                    },
-                    jsPDF: { 
-                        unit: 'px', 
-                        format: [2480, 3508],
-                        orientation: 'portrait',
-                        compress: true,
-                        precision: 16
-                    }
-                };
-
-                html2pdf()
-                    .set(opt)
-                    .from(element)
-                    .save()
-                    .then(() => {
-                        element.classList.remove('pdf-mode');
-                        overlay.classList.remove('active');
-                        overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
-                    })
-                    .catch((err) => {
-                        console.error('Erro ao gerar PDF:', err);
-                        element.classList.remove('pdf-mode');
-                        overlay.classList.remove('active');
-                        alert('Erro ao gerar PDF. Tente novamente.');
-                        overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
-                    });
-            }, 500);
+            gerarPDF(3.0, '300DPI', 0.98, 'Gerando PDF em alta qualidade...');
         }
 
         function gerarPDFBaixaQualidade() {
+            gerarPDF(1.2, '72DPI', 0.75, 'Gerando PDF para visualização...');
+        }
+
+        function gerarPNG() {
             const overlay = document.getElementById('loadingOverlay');
             overlay.classList.add('active');
-            overlay.querySelector('.loading-text').textContent = 'Gerando PDF para visualização (72 DPI)...';
-            
+            overlay.querySelector('.loading-text').textContent = 'Gerando imagem PNG...';
+
             setTimeout(() => {
                 const element = document.getElementById('folha-pedido');
-                const nomeCli = document.getElementById('cli-nome').value || 'Avulso';
-                
-                document.querySelectorAll('input').forEach(inp => {
-                    if(inp.type === 'checkbox') {
-                        if(inp.checked) inp.setAttribute('checked', 'checked');
-                        else inp.removeAttribute('checked');
-                    } else {
-                        inp.setAttribute('value', inp.value);
-                    }
-                });
+                const nomeCli = (document.getElementById('cli-nome').value || 'Avulso').trim();
+
+                prepararCamposParaExport();
 
                 element.classList.add('pdf-mode');
                 void element.offsetHeight;
 
-                const opt = {
-                    margin: 0,
-                    filename: `WinPedidos7_72DPI_${nomeCli}.pdf`,
-                    image: { type: 'jpeg', quality: 0.8 },
-                    html2canvas: { 
-                        scale: 0.72,
-                        useCORS: true,
-                        logging: false,
-                        width: 595,
-                        height: 842,
-                        windowWidth: 595,
-                        windowHeight: 842,
-                        scrollX: 0,
-                        scrollY: 0,
-                        x: 0,
-                        y: 0,
-                        onclone: function(doc) {
-                            doc.body.style.overflow = 'visible';
-                            doc.body.style.zoom = '0.72';
-                        }
-                    },
-                    jsPDF: { 
-                        unit: 'px', 
-                        format: [595, 842],
-                        orientation: 'portrait',
-                        compress: true
+                html2canvas(element, {
+                    scale: 3.0,
+                    useCORS: true,
+                    logging: false,
+                    scrollX: 0,
+                    scrollY: 0,
+                    onclone: function(doc) {
+                        doc.body.style.overflow = 'visible';
                     }
-                };
+                }).then(canvas => {
+                    element.classList.remove('pdf-mode');
+                    overlay.classList.remove('active');
+                    overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
 
-                html2pdf()
-                    .set(opt)
-                    .from(element)
-                    .save()
-                    .then(() => {
-                        element.classList.remove('pdf-mode');
-                        overlay.classList.remove('active');
-                        overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
-                    })
-                    .catch((err) => {
-                        console.error('Erro ao gerar PDF:', err);
-                        element.classList.remove('pdf-mode');
-                        overlay.classList.remove('active');
-                        alert('Erro ao gerar PDF. Tente novamente.');
-                        overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
-                    });
-            }, 500);
+                    const link = document.createElement('a');
+                    link.download = `WinPedidos7_${nomeCli}.png`;
+                    link.href = canvas.toDataURL('image/png', 1.0);
+                    link.click();
+                }).catch((err) => {
+                    console.error('Erro ao gerar PNG:', err);
+                    element.classList.remove('pdf-mode');
+                    overlay.classList.remove('active');
+                    alert('Erro ao gerar PNG. Tente novamente.');
+                    overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
+                });
+            }, 300);
         }
 
         window.onload = () => {
