@@ -185,26 +185,94 @@
         }
 
         /* --- Responsividade extra para Android/telas pequenas ---
-           Só ajusta espaçamentos/quebras, sem redefinir cores/fontes. */
-        @media (max-width: 480px) {
+           Só ajusta espaçamentos/quebras/visibilidade de texto,
+           sem redefinir cores/fontes/variáveis do CSS dinâmico. */
+
+        /* Base global: evita qualquer estouro horizontal em Android */
+        html, body {
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+        * { box-sizing: border-box; }
+
+        .topbar, .topbar-actions, .header-section, .flex-row,
+        .pedido-box, .data-box, .footer-section, .footer-right,
+        .sidebar, .paper-container, .page {
+            min-width: 0;
+        }
+
+        /* Textos longos nunca estouram a caixa: truncam com reticências
+           em vez de quebrar layout (conforme pedido: "diminuindo/escondendo") */
+        .brand span,
+        .btn span,
+        .label,
+        .order-item span,
+        .sidebar-header span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        input {
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        @media (max-width: 600px) {
+            .topbar {
+                flex-wrap: wrap;
+                gap: 6px;
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+
+            .brand span { max-width: 30vw; }
+
             .topbar-actions {
                 flex-wrap: wrap;
                 gap: 6px;
+                width: 100%;
+                justify-content: flex-start;
             }
             .topbar-actions .btn {
                 flex: 1 1 auto;
                 min-width: 0;
-                font-size: 0.82em;
-                padding: 8px 6px;
+                max-width: 100%;
+                font-size: 0.78em;
+                padding: 8px 4px;
                 justify-content: center;
+                white-space: nowrap;
+                overflow: hidden;
             }
-            .topbar-actions .btn i { margin-right: 4px; }
+            .topbar-actions .btn i { margin-right: 4px; flex-shrink: 0; }
+        }
 
+        /* Telas muito estreitas (Android pequenos/dobráveis fechados):
+           esconde o texto dos botões de ação, mantendo só o ícone,
+           para não estourar nem espremer a barra de ferramentas. */
+        @media (max-width: 380px) {
+            .topbar-actions .btn span,
+            .topbar-actions .btn { font-size: 0; padding: 8px; }
+            .topbar-actions .btn i {
+                font-size: 1rem;
+                margin-right: 0;
+            }
+            .brand span { max-width: 22vw; }
+        }
+
+        @media (max-width: 480px) {
             .flex-row { flex-wrap: wrap; }
             .flex-row .col { width: 100% !important; margin-bottom: 6px; }
 
             .header-section { flex-wrap: wrap; gap: 8px; }
             .pedido-box, .data-box { width: 100%; }
+            .data-inputs { flex-wrap: nowrap; }
+            .data-inputs input { min-width: 0; }
+
+            .label {
+                max-width: 100%;
+                display: inline-block;
+            }
 
             table, thead, tbody, th, td, tr { display: block; width: 100%; }
             .items-section table thead { display: none; }
@@ -220,12 +288,41 @@
             .col-preco::before   { content: "Preço Unt."; display:block; font-size:.7em; opacity:.65; }
             .col-total::before   { content: "Total"; display:block; font-size:.7em; opacity:.65; }
 
+            .col-quant input, .col-desc input, .col-preco input, .col-total input {
+                text-overflow: ellipsis;
+            }
+
             .footer-section { flex-direction: column; align-items: stretch; gap: 10px; }
-            .footer-right { justify-content: space-between; }
+            .footer-right { justify-content: space-between; flex-wrap: wrap; }
+            .total-label span { display: none; } /* mantém só o texto essencial via CSS content abaixo */
+            .total-value {
+                max-width: 60vw;
+                text-overflow: ellipsis;
+            }
+
+            .sidebar { max-width: 85vw; }
+            .order-item span {
+                display: inline-block;
+                max-width: 70%;
+                vertical-align: middle;
+            }
         }
 
         @media (max-width: 480px) and (orientation: portrait) {
             .paper-container { padding: 6px; }
+        }
+
+        /* Telas de altura curta (teclado Android aberto): reduz respiro
+           vertical da topbar/sidebar sem alterar cores ou tipografia. */
+        @media (max-height: 480px) and (max-width: 900px) {
+            .topbar { padding-top: 6px; padding-bottom: 6px; }
+            .sidebar-header { padding-top: 6px; padding-bottom: 6px; }
+        }
+
+        /* Evita que ícones/inputs quebrem em telas ultra estreitas (<=340px) */
+        @media (max-width: 340px) {
+            .pedido-box .label, .data-box .label { font-size: 0.75em; }
+            .col label, .flex-row .label { font-size: 0.75em; }
         }
     </style>
 
@@ -639,13 +736,49 @@
             });
         }
 
+        // ------------------------------------------------------------
+        // Espera fontes e imagens carregarem antes de capturar.
+        // Em Android é comum o html2canvas rodar antes do Font Awesome
+        // (ícones) ou de fontes web terminarem de carregar, gerando
+        // captura com ícones quebrados/texto com fonte errada.
+        // ------------------------------------------------------------
+        function aguardarRecursosProntos() {
+            const fontsReady = (document.fonts && document.fonts.ready)
+                ? document.fonts.ready
+                : Promise.resolve();
+
+            const imgs = Array.from(document.images || []);
+            const imgsReady = Promise.all(imgs.map(img => {
+                if (img.complete) return Promise.resolve();
+                return new Promise(resolve => {
+                    img.addEventListener('load', resolve, { once: true });
+                    img.addEventListener('error', resolve, { once: true });
+                });
+            }));
+
+            return Promise.race([
+                Promise.all([fontsReady, imgsReady]),
+                new Promise(resolve => setTimeout(resolve, 1500)) // trava de segurança
+            ]);
+        }
+
         function gerarPDF(scale, sufixo, qualidadeImagem, textoCarregando) {
             const overlay = document.getElementById('loadingOverlay');
             overlay.classList.add('active');
             overlay.querySelector('.loading-text').textContent = textoCarregando;
 
-            setTimeout(() => {
-                const element = document.getElementById('folha-pedido');
+            // Em Android, telas pequenas/zoom do navegador podem deixar
+            // document.documentElement.clientWidth menor que a largura real
+            // do papel — usamos scrollWidth do próprio elemento como
+            // windowWidth para o html2canvas nunca cortar a folha.
+            const element = document.getElementById('folha-pedido');
+            const larguraCaptura = Math.max(
+                element.scrollWidth,
+                element.offsetWidth,
+                document.documentElement.clientWidth
+            );
+
+            aguardarRecursosProntos().then(() => new Promise(r => setTimeout(r, 250))).then(() => {
                 const nomeCli = (document.getElementById('cli-nome').value || 'Avulso').trim();
 
                 prepararCamposParaExport();
@@ -660,11 +793,15 @@
                     html2canvas: {
                         scale: scale,
                         useCORS: true,
+                        allowTaint: false,
                         logging: false,
                         scrollX: 0,
                         scrollY: 0,
+                        windowWidth: larguraCaptura,
                         onclone: function(doc) {
                             doc.body.style.overflow = 'visible';
+                            const el = doc.getElementById('folha-pedido');
+                            if (el) el.style.overflow = 'visible';
                         }
                     },
                     jsPDF: {
@@ -676,7 +813,7 @@
                     pagebreak: { mode: ['avoid-all'] }
                 };
 
-                html2pdf()
+                return html2pdf()
                     .set(opt)
                     .from(element)
                     .save()
@@ -684,15 +821,14 @@
                         element.classList.remove('pdf-mode');
                         overlay.classList.remove('active');
                         overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
-                    })
-                    .catch((err) => {
-                        console.error('Erro ao gerar PDF:', err);
-                        element.classList.remove('pdf-mode');
-                        overlay.classList.remove('active');
-                        alert('Erro ao gerar PDF. Tente novamente.');
-                        overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
                     });
-            }, 300);
+            }).catch((err) => {
+                console.error('Erro ao gerar PDF:', err);
+                element.classList.remove('pdf-mode');
+                overlay.classList.remove('active');
+                alert('Erro ao gerar PDF. Tente novamente. Se o problema persistir, feche outros apps para liberar memória do celular.');
+                overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
+            });
         }
 
         function gerarPDFAltaQualidade() {
@@ -708,8 +844,14 @@
             overlay.classList.add('active');
             overlay.querySelector('.loading-text').textContent = 'Gerando imagem PNG...';
 
-            setTimeout(() => {
-                const element = document.getElementById('folha-pedido');
+            const element = document.getElementById('folha-pedido');
+            const larguraCaptura = Math.max(
+                element.scrollWidth,
+                element.offsetWidth,
+                document.documentElement.clientWidth
+            );
+
+            aguardarRecursosProntos().then(() => new Promise(r => setTimeout(r, 250))).then(() => {
                 const nomeCli = (document.getElementById('cli-nome').value || 'Avulso').trim();
 
                 prepararCamposParaExport();
@@ -717,32 +859,46 @@
                 element.classList.add('pdf-mode');
                 void element.offsetHeight;
 
-                html2canvas(element, {
+                return html2canvas(element, {
                     scale: 3.0,
                     useCORS: true,
+                    allowTaint: false,
                     logging: false,
                     scrollX: 0,
                     scrollY: 0,
+                    windowWidth: larguraCaptura,
                     onclone: function(doc) {
                         doc.body.style.overflow = 'visible';
+                        const el = doc.getElementById('folha-pedido');
+                        if (el) el.style.overflow = 'visible';
                     }
                 }).then(canvas => {
                     element.classList.remove('pdf-mode');
                     overlay.classList.remove('active');
                     overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
 
-                    const link = document.createElement('a');
-                    link.download = `WinPedidos7_${nomeCli}.png`;
-                    link.href = canvas.toDataURL('image/png', 1.0);
-                    link.click();
-                }).catch((err) => {
-                    console.error('Erro ao gerar PNG:', err);
-                    element.classList.remove('pdf-mode');
-                    overlay.classList.remove('active');
-                    alert('Erro ao gerar PNG. Tente novamente.');
-                    overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
+                    // toBlob evita estourar limite de memória de data URLs
+                    // gigantes em navegadores Android (WebView/Chrome mobile).
+                    canvas.toBlob(blob => {
+                        if (!blob) {
+                            alert('Erro ao gerar PNG. Tente novamente com qualidade menor.');
+                            return;
+                        }
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.download = `WinPedidos7_${nomeCli}.png`;
+                        link.href = url;
+                        link.click();
+                        setTimeout(() => URL.revokeObjectURL(url), 2000);
+                    }, 'image/png', 1.0);
                 });
-            }, 300);
+            }).catch((err) => {
+                console.error('Erro ao gerar PNG:', err);
+                element.classList.remove('pdf-mode');
+                overlay.classList.remove('active');
+                alert('Erro ao gerar PNG. Tente novamente. Se o problema persistir, feche outros apps para liberar memória do celular.');
+                overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
+            });
         }
 
         window.onload = () => {
