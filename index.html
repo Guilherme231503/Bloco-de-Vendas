@@ -715,129 +715,186 @@
             });
         }
 
-        // ------------------------------------------------------------
-        // GERAÇÃO DE PDF — CORRIGIDA
-        // Problema anterior: forçar width/height/windowWidth fixos em
-        // pixels (2480x3508 / 595x842) junto com scale, fazia o
-        // html2canvas capturar a página fora do tamanho real do
-        // elemento, gerando corte/distorção ("PDF mal formado").
-        // Agora deixamos o html2canvas medir o elemento real e
-        // controlamos a qualidade só pelo "scale", com formato de
-        // página A4 correto no jsPDF.
-        // ------------------------------------------------------------
-        function prepararCamposParaExport() {
-            document.querySelectorAll('input').forEach(inp => {
-                if (inp.type === 'checkbox') {
-                    if (inp.checked) inp.setAttribute('checked', 'checked');
-                    else inp.removeAttribute('checked');
-                } else {
-                    inp.setAttribute('value', inp.value);
+// ============================================================
+// GERAÇÃO DE PDF — VERSÃO CORRIGIDA (SEM CORTAR, ALTA QUALIDADE)
+// Usa html2canvas + jsPDF diretamente, medindo o elemento real
+// e distribuindo em múltiplas páginas A4 se necessário.
+// ============================================================
+
+function prepararCamposParaExport() {
+    document.querySelectorAll('input').forEach(inp => {
+        if (inp.type === 'checkbox') {
+            if (inp.checked) inp.setAttribute('checked', 'checked');
+            else inp.removeAttribute('checked');
+        } else {
+            inp.setAttribute('value', inp.value);
+        }
+    });
+}
+
+function aguardarRecursosProntos() {
+    const fontsReady = (document.fonts && document.fonts.ready)
+        ? document.fonts.ready
+        : Promise.resolve();
+
+    const imgs = Array.from(document.images || []);
+    const imgsReady = Promise.all(imgs.map(img => {
+        if (img.complete) return Promise.resolve();
+        return new Promise(resolve => {
+            img.addEventListener('load', resolve, { once: true });
+            img.addEventListener('error', resolve, { once: true });
+        });
+    }));
+
+    return Promise.race([
+        Promise.all([fontsReady, imgsReady]),
+        new Promise(resolve => setTimeout(resolve, 1500))
+    ]);
+}
+
+async function gerarPDFCompleto(scale, qualidadeImagem, sufixo, textoCarregando) {
+    const overlay = document.getElementById('loadingOverlay');
+    overlay.classList.add('active');
+    overlay.querySelector('.loading-text').textContent = textoCarregando;
+
+    const element = document.getElementById('folha-pedido');
+
+    try {
+        // 1. Garante que fontes/imagens carregaram
+        await aguardarRecursosProntos();
+        await new Promise(r => setTimeout(r, 300));
+
+        // 2. Prepara inputs para exportação
+        prepararCamposParaExport();
+
+        // 3. Aplica classe de modo PDF (ajusta estilos se houver)
+        element.classList.add('pdf-mode');
+        void element.offsetHeight;
+
+        // 4. Mede o elemento REAL (sem forçar tamanho fixo)
+        //    Pega a largura e altura verdadeiras do conteúdo
+        const rect = element.getBoundingClientRect();
+        const larguraReal = Math.ceil(element.scrollWidth || rect.width);
+        const alturaReal = Math.ceil(element.scrollHeight || rect.height);
+
+        // 5. Gera o canvas com html2canvas medindo o elemento real
+        const canvas = await html2canvas(element, {
+            scale: scale,                    // 3.0 = ~300 DPI
+            useCORS: true,
+            allowTaint: false,
+            logging: false,
+            scrollX: 0,
+            scrollY: 0,
+            windowWidth: larguraReal,        // largura REAL do elemento
+            windowHeight: alturaReal,        // altura REAL do elemento
+            width: larguraReal,              // força largura do canvas
+            height: alturaReal,              // força altura do canvas
+            backgroundColor: '#ffffff',
+            onclone: function(doc) {
+                // Garante que nada seja cortado no clone
+                doc.body.style.overflow = 'visible';
+                doc.documentElement.style.overflow = 'visible';
+                const el = doc.getElementById('folha-pedido');
+                if (el) {
+                    el.style.overflow = 'visible';
+                    el.style.height = 'auto';
+                    el.style.maxHeight = 'none';
                 }
-            });
-        }
-
-        // ------------------------------------------------------------
-        // Espera fontes e imagens carregarem antes de capturar.
-        // Em Android é comum o html2canvas rodar antes do Font Awesome
-        // (ícones) ou de fontes web terminarem de carregar, gerando
-        // captura com ícones quebrados/texto com fonte errada.
-        // ------------------------------------------------------------
-        function aguardarRecursosProntos() {
-            const fontsReady = (document.fonts && document.fonts.ready)
-                ? document.fonts.ready
-                : Promise.resolve();
-
-            const imgs = Array.from(document.images || []);
-            const imgsReady = Promise.all(imgs.map(img => {
-                if (img.complete) return Promise.resolve();
-                return new Promise(resolve => {
-                    img.addEventListener('load', resolve, { once: true });
-                    img.addEventListener('error', resolve, { once: true });
+                // Remove qualquer transform/scale que possa cortar
+                doc.querySelectorAll('.paper-container, .page, .border-box').forEach(n => {
+                    n.style.overflow = 'visible';
+                    n.style.transform = 'none';
                 });
-            }));
+            }
+        });
 
-            return Promise.race([
-                Promise.all([fontsReady, imgsReady]),
-                new Promise(resolve => setTimeout(resolve, 1500)) // trava de segurança
-            ]);
+        // 6. Configura PDF A4 em mm
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait',
+            compress: true
+        });
+
+        const pdfLargura = pdf.internal.pageSize.getWidth();   // 210mm
+        const pdfAltura  = pdf.internal.pageSize.getHeight();  // 297mm
+
+        // 7. Calcula proporções para caber na largura A4
+        const canvasLargura = canvas.width;
+        const canvasAltura  = canvas.height;
+        const imgLargura = pdfLargura;
+        const imgAltura  = (canvasAltura * pdfLargura) / canvasLargura;
+
+        // 8. Se couber em 1 página, adiciona direto. Senão, fatia.
+        const imgData = canvas.toDataURL('image/jpeg', qualidadeImagem);
+
+        if (imgAltura <= pdfAltura) {
+            // Cabe em 1 página — centraliza verticalmente se quiser
+            pdf.addImage(imgData, 'JPEG', 0, 0, imgLargura, imgAltura);
+        } else {
+            // Não cabe em 1 página → fatia em várias páginas SEM CORTAR
+            // Calcula quantas páginas são necessárias
+            const totalPaginas = Math.ceil(imgAltura / pdfAltura);
+
+            // Altura de cada "fatia" em pixels do canvas original
+            const fatiaAlturaPx = Math.floor(canvasLargura * (pdfAltura / pdfLargura));
+
+            let yOffsetPx = 0;
+
+            for (let i = 0; i < totalPaginas; i++) {
+                if (i > 0) pdf.addPage();
+
+                // Cria um canvas temporário para a fatia
+                const canvasFatia = document.createElement('canvas');
+                canvasFatia.width = canvasLargura;
+                const alturaRestante = canvasAltura - yOffsetPx;
+                const alturaFatia = Math.min(fatiaAlturaPx, alturaRestante);
+                canvasFatia.height = alturaFatia;
+
+                const ctx = canvasFatia.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvasFatia.width, canvasFatia.height);
+                ctx.drawImage(
+                    canvas,
+                    0, yOffsetPx,                    // origem
+                    canvasLargura, alturaFatia,      // tamanho origem
+                    0, 0,                            // destino
+                    canvasLargura, alturaFatia       // tamanho destino
+                );
+
+                const fatiaData = canvasFatia.toDataURL('image/jpeg', qualidadeImagem);
+                const fatiaAlturaMm = (alturaFatia * pdfLargura) / canvasLargura;
+
+                pdf.addImage(fatiaData, 'JPEG', 0, 0, pdfLargura, fatiaAlturaMm);
+
+                yOffsetPx += alturaFatia;
+            }
         }
 
-        function gerarPDF(scale, sufixo, qualidadeImagem, textoCarregando) {
-            const overlay = document.getElementById('loadingOverlay');
-            overlay.classList.add('active');
-            overlay.querySelector('.loading-text').textContent = textoCarregando;
+        // 9. Salva
+        const nomeCli = (document.getElementById('cli-nome').value || 'Avulso').trim();
+        pdf.save(`WinPedidos7_${sufixo}_${nomeCli}.pdf`);
 
-            // Em Android, telas pequenas/zoom do navegador podem deixar
-            // document.documentElement.clientWidth menor que a largura real
-            // do papel — usamos scrollWidth do próprio elemento como
-            // windowWidth para o html2canvas nunca cortar a folha.
-            const element = document.getElementById('folha-pedido');
-            const larguraCaptura = Math.max(
-                element.scrollWidth,
-                element.offsetWidth,
-                document.documentElement.clientWidth
-            );
+    } catch (err) {
+        console.error('Erro ao gerar PDF:', err);
+        alert('Erro ao gerar PDF. Tente novamente. Se persistir, feche outros apps para liberar memória.');
+    } finally {
+        element.classList.remove('pdf-mode');
+        overlay.classList.remove('active');
+        overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
+    }
+}
 
-            aguardarRecursosProntos().then(() => new Promise(r => setTimeout(r, 250))).then(() => {
-                const nomeCli = (document.getElementById('cli-nome').value || 'Avulso').trim();
+function gerarPDFAltaQualidade() {
+    // scale 3.0 ≈ 300 DPI em A4
+    gerarPDFCompleto(3.0, 0.98, '300DPI', 'Gerando PDF em alta qualidade...');
+}
 
-                prepararCamposParaExport();
-
-                element.classList.add('pdf-mode');
-                void element.offsetHeight;
-
-                const opt = {
-                    margin: 0,
-                    filename: `WinPedidos7_${sufixo}_${nomeCli}.pdf`,
-                    image: { type: 'jpeg', quality: qualidadeImagem },
-                    html2canvas: {
-                        scale: scale,
-                        useCORS: true,
-                        allowTaint: false,
-                        logging: false,
-                        scrollX: 0,
-                        scrollY: 0,
-                        windowWidth: larguraCaptura,
-                        onclone: function(doc) {
-                            doc.body.style.overflow = 'visible';
-                            const el = doc.getElementById('folha-pedido');
-                            if (el) el.style.overflow = 'visible';
-                        }
-                    },
-                    jsPDF: {
-                        unit: 'mm',
-                        format: 'a4',
-                        orientation: 'portrait',
-                        compress: true
-                    },
-                    pagebreak: { mode: ['avoid-all'] }
-                };
-
-                return html2pdf()
-                    .set(opt)
-                    .from(element)
-                    .save()
-                    .then(() => {
-                        element.classList.remove('pdf-mode');
-                        overlay.classList.remove('active');
-                        overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
-                    });
-            }).catch((err) => {
-                console.error('Erro ao gerar PDF:', err);
-                element.classList.remove('pdf-mode');
-                overlay.classList.remove('active');
-                alert('Erro ao gerar PDF. Tente novamente. Se o problema persistir, feche outros apps para liberar memória do celular.');
-                overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
-            });
-        }
-
-        function gerarPDFAltaQualidade() {
-            gerarPDF(3.0, '300DPI', 0.98, 'Gerando PDF em alta qualidade...');
-        }
-
-        function gerarPDFBaixaQualidade() {
-            gerarPDF(1.2, '72DPI', 0.75, 'Gerando PDF para visualização...');
-        }
+function gerarPDFBaixaQualidade() {
+    // scale 1.2 ≈ 72 DPI (arquivo leve)
+    gerarPDFCompleto(1.2, 0.75, '72DPI', 'Gerando PDF para visualização...');
+}
 
         function gerarPNG() {
             const overlay = document.getElementById('loadingOverlay');
