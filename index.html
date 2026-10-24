@@ -2,7 +2,10 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Pedidos - Gerenciador de Pedidos</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,7 +18,7 @@
 <body>
 
     <!-- LOADING OVERLAY -->
-    <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-overlay" id="loadingOverlay" role="status" aria-live="polite">
         <div class="loading-box">
             <i class="fas fa-spinner"></i>
             <div class="loading-text">Gerando documento...</div>
@@ -41,24 +44,27 @@
                 <i class="fas fa-file-invoice"></i>
                 <span>Pedidos</span>
             </div>
-            <button class="btn menu-toggle" onclick="toggleSidebar()">
+            <button type="button" class="btn menu-toggle" onclick="toggleSidebar()" aria-label="Abrir pedidos salvos" title="Pedidos salvos">
                 <i class="fas fa-bars"></i>
             </button>
             <div class="topbar-actions">
-                <button class="btn" onclick="novoPedido()">
+                <button type="button" class="btn" onclick="novoPedido()" title="Novo pedido (Alt+N)">
                     <i class="fas fa-plus"></i> Novo
                 </button>
-                <button class="btn btn-primary" onclick="salvarPedidoNomeado()">
+                <button type="button" class="btn btn-primary" onclick="salvarPedidoNomeado()" title="Salvar (Ctrl+S)">
                     <i class="fas fa-save"></i> Salvar
                 </button>
-                <button class="btn btn-success" onclick="gerarPDFAltaQualidade()">
+                <button type="button" class="btn btn-success" onclick="gerarPDFAltaQualidade()" title="PDF em alta qualidade">
                     <i class="fas fa-file-pdf"></i> PDF 300 DPI
                 </button>
-                <button class="btn" onclick="gerarPDFBaixaQualidade()">
+                <button type="button" class="btn" onclick="gerarPDFBaixaQualidade()" title="PDF leve">
                     <i class="fas fa-file-pdf"></i> PDF 72 DPI
                 </button>
-                <button class="btn" onclick="gerarPNG()">
+                <button type="button" class="btn" onclick="gerarPNG()" title="Exportar imagem PNG">
                     <i class="fas fa-file-image"></i> PNG
+                </button>
+                <button type="button" class="btn" id="btn-fs" onclick="toggleFullscreen()" title="Tela cheia (Alt+F)" aria-label="Tela cheia">
+                    <i class="fas fa-expand"></i> Tela cheia
                 </button>
             </div>
         </div>
@@ -72,16 +78,16 @@
                     <div class="header-section">
                         <div class="pedido-box">
                             <span class="label">PEDIDO Nº</span>
-                            <input type="text" id="pedido-num" oninput="saveDraft()">
+                            <input type="text" id="pedido-num" oninput="saveDraft()" autocomplete="off" enterkeyhint="next">
                         </div>
                         <div class="data-box">
                             <span class="label">DATA</span>
                             <div class="data-inputs">
-                                <input type="text" id="data-d" maxlength="2" oninput="saveDraft()">
+                                <input type="text" id="data-d" maxlength="2" oninput="saveDraft()" placeholder="DD" aria-label="Dia">
                                 <span>/</span>
-                                <input type="text" id="data-m" maxlength="2" oninput="saveDraft()">
+                                <input type="text" id="data-m" maxlength="2" oninput="saveDraft()" placeholder="MM" aria-label="Mês">
                                 <span>/</span>
-                                <input type="text" id="data-a" maxlength="4" oninput="saveDraft()">
+                                <input type="text" id="data-a" maxlength="4" oninput="saveDraft()" placeholder="AAAA" aria-label="Ano">
                             </div>
                         </div>
                     </div>
@@ -90,35 +96,35 @@
                     <div class="flex-row">
                         <div class="col" style="width: 70%;">
                             <span class="label"><i class="fas fa-user" style="margin-right:4px;"></i>NOME:</span>
-                            <input type="text" id="cli-nome" oninput="saveDraft()">
+                            <input type="text" id="cli-nome" oninput="saveDraft()" autocomplete="name" autocapitalize="words" enterkeyhint="next">
                         </div>
                         <div class="col" style="width: 30%;">
                             <span class="label"><i class="fas fa-phone" style="margin-right:4px;"></i>TEL:</span>
-                            <input type="text" id="cli-tel" oninput="saveDraft()">
+                            <input type="text" id="cli-tel" oninput="saveDraft()" autocomplete="tel" enterkeyhint="next">
                         </div>
                     </div>
                     <div class="flex-row">
                         <div class="col" style="width: 70%;">
                             <span class="label"><i class="fas fa-home" style="margin-right:4px;"></i>ENDEREÇO:</span>
-                            <input type="text" id="cli-end" oninput="saveDraft()">
+                            <input type="text" id="cli-end" oninput="saveDraft()" autocomplete="street-address" autocapitalize="words" enterkeyhint="next">
                         </div>
                         <div class="col" style="width: 30%;">
                             <span class="label">BAIRRO:</span>
-                            <input type="text" id="cli-bairro" oninput="saveDraft()">
+                            <input type="text" id="cli-bairro" oninput="saveDraft()" autocapitalize="words" enterkeyhint="next">
                         </div>
                     </div>
                     <div class="flex-row">
                         <div class="col" style="width: 60%;">
                             <span class="label"><i class="fas fa-city" style="margin-right:4px;"></i>MUNICIPIO:</span>
-                            <input type="text" id="cli-mun" oninput="saveDraft()">
+                            <input type="text" id="cli-mun" oninput="saveDraft()" autocapitalize="words" enterkeyhint="next">
                         </div>
                         <div class="col" style="width: 15%;">
                             <span class="label">UF</span>
-                            <input type="text" id="cli-uf" maxlength="2" style="text-align:center;" oninput="saveDraft()">
+                            <input type="text" id="cli-uf" maxlength="2" style="text-align:center;" oninput="saveDraft()" enterkeyhint="next">
                         </div>
                         <div class="col" style="width: 25%;">
                             <span class="label"><i class="fas fa-map-pin"></i> CEP</span>
-                            <input type="text" id="cli-cep" oninput="saveDraft()">
+                            <input type="text" id="cli-cep" oninput="saveDraft()" autocomplete="postal-code" enterkeyhint="next">
                         </div>
                     </div>
 
@@ -152,6 +158,24 @@
             </div>
         </div>
     </main>
+
+    <!-- ===== Extras de interface (fora do papel, não entram no PDF) ===== -->
+    <div class="ux-total" id="ux-total" aria-live="polite">
+        <i class="fas fa-calculator"></i>
+        <span class="ux-total-count" id="ux-total-count">0 itens</span>
+        <strong id="ux-total-val">R$ 0,00</strong>
+    </div>
+    <div class="ux-status" id="ux-status" aria-live="polite"></div>
+    <div class="ux-fab" id="ux-fab">
+        <button type="button" class="ux-fab-btn" onclick="toggleToolbarFS()" aria-label="Mostrar/ocultar barra de ferramentas" title="Barra de ferramentas">
+            <i class="fas fa-sliders"></i>
+        </button>
+        <button type="button" class="ux-fab-btn" onclick="toggleFullscreen()" aria-label="Sair da tela cheia" title="Sair da tela cheia (Esc)">
+            <i class="fas fa-compress"></i>
+        </button>
+    </div>
+    <div id="ux-toasts" class="ux-toasts" aria-live="assertive"></div>
+    <div id="ux-modal-host"></div>
 
     <style>
         /* ============================================================
@@ -326,6 +350,211 @@
         }
     </style>
 
+    <style id="ux-extras">
+        /* ============================================================
+           CAMADA EXTRA DE INTERFACE (aditiva)
+           Só adiciona classes novas (.ux-*) e pequenos refinamentos.
+           O CSS dinâmico por dispositivo (./css/*.css) NÃO é alterado.
+        ============================================================ */
+
+        /* ---------- Feedback de toque / foco ---------- */
+        .btn:active { transform: scale(.97); }
+        .paper-container input:focus-visible {
+            outline: 2px solid #2563eb;
+            outline-offset: 1px;
+        }
+        #items-body tr:focus-within {
+            background-image: linear-gradient(rgba(37,99,235,.08), rgba(37,99,235,.08));
+        }
+        #items-body tr.ux-row-in { animation: uxRowIn .28s ease both; }
+        @keyframes uxRowIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Alvos de toque maiores em telas touch */
+        @media (pointer: coarse) {
+            .btn, .delete-btn { min-height: 40px; }
+            .delete-btn { min-width: 40px; }
+            .order-item { min-height: 46px; }
+        }
+
+        /* Evita zoom automático do iOS ao focar campos no celular */
+        @media (max-width: 480px) {
+            #folha-pedido input { font-size: max(16px, 1em); }
+        }
+
+        /* Tablet: barra de ferramentas quebra em linhas em vez de estourar */
+        @media (min-width: 601px) and (max-width: 1024px) {
+            .topbar-actions { flex-wrap: wrap; gap: 6px; }
+            .paper-container { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+        }
+
+        /* Desktop largo: respiro extra ao redor do papel */
+        @media (min-width: 1280px) {
+            .paper-container { scroll-behavior: smooth; }
+        }
+
+        /* ---------- Durante a exportação ---------- */
+        body.exporting .topbar-actions .btn { pointer-events: none; opacity: .55; }
+        /* Garante que animações não congelem no meio ao capturar PDF/PNG */
+        #folha-pedido.pdf-mode *,
+        #folha-pedido.pdf-mode *::before,
+        #folha-pedido.pdf-mode *::after {
+            animation: none !important;
+            transition: none !important;
+        }
+        #folha-pedido.pdf-mode #items-body tr { background-image: none !important; }
+        #folha-pedido.pdf-mode input { outline: none !important; caret-color: transparent; }
+
+        /* ---------- Busca na barra lateral ---------- */
+        .ux-search { position: relative; padding: 8px 10px; }
+        .ux-search i {
+            position: absolute; left: 20px; top: 50%;
+            transform: translateY(-50%); opacity: .55; pointer-events: none;
+            font-size: .85em;
+        }
+        .ux-search input {
+            width: 100%; padding: 9px 10px 9px 32px;
+            border-radius: 10px; font: inherit; color: inherit;
+            background: rgba(127,127,127,.12);
+            border: 1px solid rgba(127,127,127,.3);
+            outline: none;
+        }
+        .ux-search input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.18); }
+        .ux-empty { padding: 22px 14px; text-align: center; opacity: .6; font-size: .9em; line-height: 1.5; }
+        .ux-empty i { display: block; font-size: 1.8em; margin-bottom: 8px; opacity: .6; }
+        .order-item.ux-active {
+            background-image: linear-gradient(rgba(37,99,235,.16), rgba(37,99,235,.16));
+            box-shadow: inset 3px 0 0 #2563eb;
+        }
+        .order-item { animation: uxRowIn .25s ease both; }
+        .order-item span small {
+            display: block; font-size: .75em; opacity: .65;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+
+        /* ---------- Total flutuante (celular/tablet) ---------- */
+        .ux-total {
+            position: fixed; left: 12px;
+            bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+            z-index: 900;
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 16px; border-radius: 999px;
+            background: rgba(17,24,39,.92); color: #fff;
+            box-shadow: 0 6px 20px rgba(0,0,0,.28);
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            font-size: .95rem; max-width: calc(100vw - 90px);
+            transform: translateX(-140%);
+            transition: transform .32s cubic-bezier(.22,.68,.36,1);
+            pointer-events: none;
+        }
+        .ux-total.show { transform: translateX(0); }
+        .ux-total .ux-total-count { opacity: .7; font-size: .8em; white-space: nowrap; }
+        .ux-total strong { white-space: nowrap; font-variant-numeric: tabular-nums; }
+        @media (min-width: 1025px) { .ux-total { display: none; } }
+
+        /* ---------- Indicador de rascunho ---------- */
+        .ux-status {
+            position: fixed; left: 50%;
+            bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+            transform: translate(-50%, 10px);
+            z-index: 900; padding: 4px 12px; border-radius: 999px;
+            background: rgba(17,24,39,.8); color: #fff; font-size: .72rem;
+            opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s;
+            white-space: nowrap;
+        }
+        .ux-status.show { opacity: 1; transform: translate(-50%, 0); }
+
+        /* ---------- Tela cheia ---------- */
+        .ux-fab {
+            position: fixed; right: 12px;
+            bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+            z-index: 950; display: none; flex-direction: column; gap: 10px;
+        }
+        body.is-fullscreen .ux-fab { display: flex; }
+        .ux-fab-btn {
+            width: 46px; height: 46px; border-radius: 50%; border: 0; cursor: pointer;
+            background: rgba(17,24,39,.9); color: #fff; font-size: 1rem;
+            box-shadow: 0 6px 18px rgba(0,0,0,.3);
+            display: flex; align-items: center; justify-content: center;
+            transition: transform .15s, background .2s;
+        }
+        .ux-fab-btn:hover { background: #2563eb; }
+        .ux-fab-btn:active { transform: scale(.92); }
+        /* Em tela cheia a barra fica oculta até o usuário chamar */
+        body.is-fullscreen:not(.show-bar) .topbar { display: none; }
+        /* Se o navegador não suporta fullscreen real (ex.: iPhone), o botão vira "modo foco" */
+        body.is-fullscreen .paper-container { scroll-behavior: smooth; }
+
+        /* ---------- Toasts ---------- */
+        .ux-toasts {
+            position: fixed; left: 50%; transform: translateX(-50%);
+            top: calc(12px + env(safe-area-inset-top, 0px));
+            z-index: 10001; display: flex; flex-direction: column; gap: 8px;
+            align-items: center; pointer-events: none;
+            width: calc(100% - 24px); max-width: 420px;
+        }
+        .ux-toast {
+            display: flex; align-items: center; gap: 10px;
+            padding: 11px 16px; border-radius: 12px; font-size: .92rem;
+            background: rgba(17,24,39,.95); color: #fff; max-width: 100%;
+            box-shadow: 0 8px 24px rgba(0,0,0,.3);
+            opacity: 0; transform: translateY(-14px) scale(.96);
+            transition: opacity .28s, transform .28s cubic-bezier(.22,.68,.36,1);
+        }
+        .ux-toast.show { opacity: 1; transform: none; }
+        .ux-toast.ux-success i { color: #34d399; }
+        .ux-toast.ux-error i { color: #f87171; }
+        .ux-toast.ux-info i { color: #60a5fa; }
+
+        /* ---------- Diálogos (substituem prompt/confirm/alert) ---------- */
+        .ux-modal-backdrop {
+            position: fixed; inset: 0; z-index: 10000;
+            display: flex; align-items: center; justify-content: center; padding: 16px;
+            background: rgba(15,23,42,.55);
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            animation: uxFade .2s ease both;
+        }
+        .ux-modal {
+            width: 100%; max-width: 420px; padding: 20px; border-radius: 16px;
+            background: #fff; color: #111827;
+            box-shadow: 0 20px 50px rgba(0,0,0,.35);
+            animation: uxPop .25s cubic-bezier(.22,.68,.36,1) both;
+        }
+        .ux-modal-title { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
+        .ux-modal-title i { color: #2563eb; }
+        .ux-modal.ux-danger .ux-modal-title i { color: #dc2626; }
+        .ux-modal-msg { margin: 0 0 14px; line-height: 1.45; opacity: .85; }
+        .ux-modal-msg:empty { display: none; }
+        .ux-modal-input {
+            width: 100%; padding: 12px; font-size: 16px; border-radius: 10px;
+            border: 1px solid #cbd5e1; background: #fff; color: inherit; margin-bottom: 16px; outline: none;
+        }
+        .ux-modal-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,.2); }
+        .ux-modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .ux-mbtn {
+            padding: 11px 18px; border-radius: 10px; border: 0; cursor: pointer;
+            font: inherit; font-weight: 600; min-height: 44px;
+        }
+        .ux-mbtn.ux-cancel { background: #e5e7eb; color: #111827; }
+        .ux-mbtn.ux-ok { background: #2563eb; color: #fff; }
+        .ux-modal.ux-danger .ux-mbtn.ux-ok { background: #dc2626; }
+        .ux-mbtn:active { transform: scale(.97); }
+        @keyframes uxFade { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes uxPop { from { opacity: 0; transform: translateY(10px) scale(.95); } to { opacity: 1; transform: none; } }
+        @media (prefers-color-scheme: dark) {
+            .ux-modal { background: #1e293b; color: #e5e7eb; }
+            .ux-modal-input { background: #0f172a; border-color: #334155; }
+            .ux-mbtn.ux-cancel { background: #334155; color: #e5e7eb; }
+        }
+        @media (max-width: 480px) {
+            .ux-modal-backdrop { align-items: flex-end; padding: 0; }
+            .ux-modal { border-radius: 18px 18px 0 0; max-width: none; padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
+            .ux-modal-actions .ux-mbtn { flex: 1; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .ux-toast, .ux-total, .ux-status, .ux-modal, .ux-modal-backdrop, .order-item, #items-body tr.ux-row-in { animation: none !important; transition: none !important; }
+        }
+    </style>
+
     <script>
         // ============================================================
         // DETECÇÃO DE DISPOSITIVO E CARGA DE CSS PERSONALIZADO
@@ -423,95 +652,225 @@
         // ============================================================
         // LÓGICA PRINCIPAL DO PEDIDO
         // ============================================================
+        const $ = (sel, root = document) => root.querySelector(sel);
         const tbody = document.getElementById('items-body');
         const MIN_ROWS = 15;
-        let activeOrderId = null;
+        const EXPORT_W = 794;            // largura A4 em px (96 dpi) usada na exportação
+        const PDF_FONT_FACTOR = 1.2;     // aumento da fonte no PDF/PNG
+        const STORE = { draft: 'pedido_draft', list: 'pedidos_lista', active: 'pedido_active_id' };
 
+        let activeOrderId = null;
+        let dirty = false;               // alterações não salvas
+        let animarLinhas = false;
+        let exporting = false;
+
+        // ---------- localStorage seguro ----------
+        function lsGet(key, fallback) {
+            try {
+                const v = localStorage.getItem(key);
+                return v === null ? fallback : JSON.parse(v);
+            } catch (e) { return fallback; }
+        }
+        function lsSet(key, val) {
+            try { localStorage.setItem(key, JSON.stringify(val)); return true; }
+            catch (e) { toast('Não foi possível gravar os dados (armazenamento cheio ou bloqueado).', 'error', 4500); return false; }
+        }
+
+        // ============================================================
+        // TOASTS E DIÁLOGOS
+        // ============================================================
+        function toast(msg, type = 'info', ms = 2600) {
+            const host = document.getElementById('ux-toasts');
+            const icons = { success: 'fa-circle-check', error: 'fa-circle-exclamation', info: 'fa-circle-info' };
+            const t = document.createElement('div');
+            t.className = 'ux-toast ux-' + (icons[type] ? type : 'info');
+            t.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span></span>`;
+            t.querySelector('span').textContent = msg;
+            host.appendChild(t);
+            requestAnimationFrame(() => t.classList.add('show'));
+            setTimeout(() => {
+                t.classList.remove('show');
+                setTimeout(() => t.remove(), 320);
+            }, ms);
+        }
+
+        function uiDialog({ title, message = '', input = false, value = '', ok = 'OK', cancel = 'Cancelar', danger = false, icon = 'fa-circle-question' }) {
+            return new Promise(resolve => {
+                const host = document.getElementById('ux-modal-host');
+                const prevFocus = document.activeElement;
+                const back = document.createElement('div');
+                back.className = 'ux-modal-backdrop';
+                back.innerHTML = `
+                    <div class="ux-modal ${danger ? 'ux-danger' : ''}" role="dialog" aria-modal="true">
+                        <div class="ux-modal-title"><i class="fas ${icon}"></i><span></span></div>
+                        <p class="ux-modal-msg"></p>
+                        ${input ? '<input type="text" class="ux-modal-input" autocomplete="off">' : ''}
+                        <div class="ux-modal-actions">
+                            <button type="button" class="ux-mbtn ux-cancel"></button>
+                            <button type="button" class="ux-mbtn ux-ok"></button>
+                        </div>
+                    </div>`;
+                back.querySelector('.ux-modal-title span').textContent = title;
+                back.querySelector('.ux-modal-msg').textContent = message;
+                back.querySelector('.ux-cancel').textContent = cancel;
+                back.querySelector('.ux-ok').textContent = ok;
+                const field = back.querySelector('.ux-modal-input');
+                if (field) field.value = value;
+
+                const close = result => {
+                    back.remove();
+                    if (prevFocus && prevFocus.focus) try { prevFocus.focus({ preventScroll: true }); } catch (e) {}
+                    resolve(result);
+                };
+                const confirmar = () => close(input ? field.value : true);
+                const cancelar = () => close(input ? null : false);
+
+                back.querySelector('.ux-ok').onclick = confirmar;
+                back.querySelector('.ux-cancel').onclick = cancelar;
+                back.addEventListener('mousedown', e => { if (e.target === back) cancelar(); });
+                back.addEventListener('keydown', e => {
+                    e.stopPropagation();
+                    if (e.key === 'Escape') { e.preventDefault(); cancelar(); }
+                    else if (e.key === 'Enter') { e.preventDefault(); confirmar(); }
+                });
+
+                host.appendChild(back);
+                setTimeout(() => {
+                    if (field) { field.focus(); field.select(); }
+                    else back.querySelector('.ux-ok').focus();
+                }, 30);
+            });
+        }
+
+        // ============================================================
+        // SIDEBAR
+        // ============================================================
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
         }
 
         function closeSidebarMobile() {
-            if(window.innerWidth <= 768) {
+            if (window.innerWidth <= 768) {
                 document.getElementById('sidebar').classList.remove('active');
             }
         }
 
-        // ------------------------------------------------------------
-        // FORMATAÇÃO DE MOEDA — CORRIGIDA
-        // Antes: parseMoney fazia replace(/\./g,'') em QUALQUER texto,
-        // então digitar "70" (inteiro) virava "70", mas ao formatar o
-        // total com toFixed(2) e trocar ponto por vírgula, um valor já
-        // formatado (ex: "9.999,99") era relido e o ponto de milhar
-        // era removido incorretamente em cascata, gerando totais
-        // absurdos como 70 x 30 = "210.000" em vez de "2.100,00".
-        // Agora os valores são guardados sempre como NÚMERO (float)
-        // internamente, e só formatados para exibição — nunca
-        // reprocessados a partir de uma string já formatada.
-        // ------------------------------------------------------------
+        // ============================================================
+        // TELA CHEIA (com "modo foco" de reserva para iPhone)
+        // ============================================================
+        const fsRoot = document.documentElement;
+        const fsNativo = !!(fsRoot.requestFullscreen || fsRoot.webkitRequestFullscreen);
+        const fsAtivoNativo = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
 
-        // Converte string digitada (podendo ter . de milhar e , decimal) em número
+        function syncFullscreenUI(ativo) {
+            document.body.classList.toggle('is-fullscreen', ativo);
+            if (!ativo) document.body.classList.remove('show-bar');
+            const btn = document.getElementById('btn-fs');
+            if (btn) {
+                btn.innerHTML = ativo
+                    ? '<i class="fas fa-compress"></i> Sair'
+                    : '<i class="fas fa-expand"></i> Tela cheia';
+                btn.setAttribute('aria-label', ativo ? 'Sair da tela cheia' : 'Tela cheia');
+            }
+        }
+
+        async function toggleFullscreen() {
+            const ativo = document.body.classList.contains('is-fullscreen');
+            try {
+                if (!ativo) {
+                    if (fsNativo) {
+                        const req = fsRoot.requestFullscreen || fsRoot.webkitRequestFullscreen;
+                        await req.call(fsRoot);
+                    }
+                    syncFullscreenUI(true);
+                    toast(fsNativo ? 'Tela cheia ativada. Use o botão flutuante para a barra de ferramentas.' : 'Modo foco ativado.', 'info', 3200);
+                } else {
+                    if (fsNativo && fsAtivoNativo()) {
+                        const ex = document.exitFullscreen || document.webkitExitFullscreen;
+                        await ex.call(document);
+                    }
+                    syncFullscreenUI(false);
+                }
+            } catch (e) {
+                // Se o navegador recusar, cai para o modo foco
+                syncFullscreenUI(!ativo);
+            }
+        }
+
+        function toggleToolbarFS() {
+            document.body.classList.toggle('show-bar');
+        }
+
+        function onFsChange() {
+            // Usuário saiu com ESC / gesto do sistema
+            if (!fsAtivoNativo() && document.body.classList.contains('is-fullscreen') && fsNativo) {
+                syncFullscreenUI(false);
+            }
+        }
+        document.addEventListener('fullscreenchange', onFsChange);
+        document.addEventListener('webkitfullscreenchange', onFsChange);
+
+        // ============================================================
+        // MOEDA — valores sempre tratados como NÚMERO internamente
+        // ============================================================
         function parseMoney(str) {
             if (str === null || str === undefined || str === '') return 0;
-            str = String(str).trim();
-            // remove tudo que não é dígito, ponto, vírgula ou sinal
-            str = str.replace(/[^\d.,-]/g, '');
+            str = String(str).trim().replace(/[^\d.,-]/g, '');
             if (str === '') return 0;
 
             const temVirgula = str.includes(',');
             const temPonto = str.includes('.');
 
             if (temVirgula && temPonto) {
-                // formato 9.999,99 -> ponto é milhar, vírgula é decimal
+                // 9.999,99 -> ponto é milhar, vírgula é decimal
                 str = str.replace(/\./g, '').replace(',', '.');
             } else if (temVirgula) {
-                // formato 9999,99 -> vírgula é decimal
                 str = str.replace(',', '.');
             } else if (temPonto) {
-                // Só ponto: se houver mais de 2 dígitos após o único ponto
-                // e o ponto não estiver a exatamente 3 dígitos do fim seguido
-                // de outro grupo, tratamos como decimal (ex: "70.5"); mas se
-                // parecer separador de milhar (ex: "1.234"), tratamos como milhar.
                 const partes = str.split('.');
-                if (partes.length === 2 && partes[1].length === 3 && partes[0].length <= 3) {
-                    // ambíguo tipo "1.234" — assume milhar (padrão BR)
+                if (partes.length > 2) {
+                    // 1.234.567 -> só milhares
+                    str = str.replace(/\./g, '');
+                } else if (partes[1].length === 3 && partes[0].length <= 3) {
+                    // "1.234" -> milhar (padrão BR)
                     str = str.replace('.', '');
                 }
-                // senão mantém o ponto como decimal (ex: "70.50")
             }
             const n = parseFloat(str);
             return isNaN(n) ? 0 : n;
         }
 
-        // Formata número para exibição: R$ 9.999,99
         function formatMoneyDisplay(value, comPrefixo = false) {
             const n = isNaN(value) ? 0 : Number(value);
-            const formatado = n.toLocaleString('pt-BR', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
+            const formatado = n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             return comPrefixo ? `R$ ${formatado}` : formatado;
         }
+        function formatMoney(value) { return formatMoneyDisplay(value, false); }
 
-        // Formata apenas para os campos de input (sem R$, ex: 9.999,99)
-        function formatMoney(value) {
-            return formatMoneyDisplay(value, false);
-        }
+        const arred = n => Math.round((n + Number.EPSILON) * 100) / 100;
 
-        function addRow(data = {q: '', d: '', p: '', t: ''}) {
+        // ============================================================
+        // LINHAS DA TABELA
+        // ============================================================
+        function addRow(data = {}) {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="col-quant"><input type="text" inputmode="decimal" class="item-q" value="${data.q}"></td>
-                <td class="col-desc"><input type="text" class="item-d" value="${data.d}"></td>
-                <td class="col-preco"><input type="text" inputmode="decimal" class="item-p" value="${data.p}"></td>
-                <td class="col-total"><input type="text" class="item-t" value="${data.t}" readonly></td>
+                <td class="col-quant"><input type="text" inputmode="decimal" class="item-q" aria-label="Quantidade" autocomplete="off" enterkeyhint="next"></td>
+                <td class="col-desc"><input type="text" class="item-d" aria-label="Descrição" autocomplete="off" autocapitalize="sentences" enterkeyhint="next"></td>
+                <td class="col-preco"><input type="text" inputmode="decimal" class="item-p" aria-label="Preço unitário" autocomplete="off" enterkeyhint="next"></td>
+                <td class="col-total"><input type="text" class="item-t" aria-label="Total da linha" tabindex="-1" readonly></td>
             `;
-
             const qInput = tr.querySelector('.item-q');
-            const pInput = tr.querySelector('.item-p');
             const dInput = tr.querySelector('.item-d');
+            const pInput = tr.querySelector('.item-p');
+            const tInput = tr.querySelector('.item-t');
 
-            // Cálculo em tempo real a cada tecla digitada (input), não só ao sair do campo
+            // valores atribuídos via propriedade (evita quebrar com aspas / injeção de HTML)
+            qInput.value = data.q ?? '';
+            dInput.value = data.d ?? '';
+            pInput.value = data.p ?? '';
+            tInput.value = data.t ?? '';
+
             [qInput, pInput, dInput].forEach(inp => {
                 inp.addEventListener('input', () => {
                     handleInput(tr);
@@ -519,454 +878,740 @@
                 });
             });
 
-            // Ao perder o foco, formata o preço unitário bonito (9.999,99)
-            pInput.addEventListener('blur', () => {
-                const v = parseMoney(pInput.value);
-                pInput.value = v > 0 ? formatMoney(v) : pInput.value;
+            // Seleciona o conteúdo ao focar nos campos numéricos (facilita no celular)
+            [qInput, pInput].forEach(inp => {
+                inp.addEventListener('focus', () => setTimeout(() => { try { inp.select(); } catch (e) {} }, 0));
             });
 
+            // Ao sair do preço, formata bonito (9.999,99)
+            pInput.addEventListener('blur', () => {
+                const v = parseMoney(pInput.value);
+                if (v > 0) pInput.value = formatMoney(v);
+            });
+
+            if (animarLinhas) {
+                tr.classList.add('ux-row-in');
+                tr.addEventListener('animationend', () => tr.classList.remove('ux-row-in'), { once: true });
+            }
             tbody.appendChild(tr);
+            return tr;
         }
 
-        function handleInput(currentRow) {
-            const qInput = currentRow.querySelector('.item-q');
-            const pInput = currentRow.querySelector('.item-p');
-            const tInput = currentRow.querySelector('.item-t');
+        function totalDaLinha(tr) {
+            const q = parseMoney(tr.querySelector('.item-q').value);
+            const p = parseMoney(tr.querySelector('.item-p').value);
+            return (q > 0 && p > 0) ? arred(q * p) : 0;
+        }
 
-            const q = parseMoney(qInput.value);
-            const p = parseMoney(pInput.value);
-
-            if (q > 0 && p > 0) {
-                const totalLinha = q * p;
-                tInput.value = formatMoney(totalLinha);
-                tInput.classList.remove('pulsing');
-                void tInput.offsetWidth; // reinicia animação
-                tInput.classList.add('pulsing');
+        function updateRow(tr, pulse = true) {
+            const tInput = tr.querySelector('.item-t');
+            const total = totalDaLinha(tr);
+            if (total > 0) {
+                const novo = formatMoney(total);
+                if (tInput.value !== novo) {
+                    tInput.value = novo;
+                    if (pulse) {
+                        tInput.classList.remove('pulsing');
+                        void tInput.offsetWidth;
+                        tInput.classList.add('pulsing');
+                    }
+                }
             } else {
                 tInput.value = '';
             }
+        }
 
-            const allRows = tbody.querySelectorAll('tr');
-            const lastRow = allRows[allRows.length - 1];
+        function handleInput(currentRow) {
+            updateRow(currentRow);
 
+            const lastRow = tbody.lastElementChild;
             if (currentRow === lastRow) {
-                let hasContent = Array.from(lastRow.querySelectorAll('input')).some(inp => inp.value.trim() !== '');
+                const hasContent = Array.from(lastRow.querySelectorAll('input')).some(inp => inp.value.trim() !== '');
                 if (hasContent) addRow();
             }
-
             calculateGrandTotal();
         }
 
         function calculateGrandTotal() {
-            let total = 0;
-            document.querySelectorAll('.item-t').forEach(input => {
-                total += parseMoney(input.value);
+            let total = 0, itens = 0;
+            tbody.querySelectorAll('tr').forEach(tr => {
+                const t = totalDaLinha(tr);
+                if (t > 0) { total += t; itens++; }
             });
-            renderTotalComAnimacao(total);
+            renderTotalComAnimacao(arred(total), itens);
         }
 
-        // Animação estilo "app financeiro": números sobem com leve blur
+        // Animação estilo "app financeiro"
         let ultimoTotalExibido = null;
-        function renderTotalComAnimacao(total) {
-            const totalDiv = document.getElementById('total-geral');
+        function renderTotalComAnimacao(total, itens = 0) {
             const textoFinal = `R$ ${formatMoney(total)}`;
 
-            if (ultimoTotalExibido === textoFinal) return; // evita re-render sem mudança
-            ultimoTotalExibido = textoFinal;
+            // Total flutuante (celular/tablet)
+            const fv = document.getElementById('ux-total-val');
+            const fc = document.getElementById('ux-total-count');
+            if (fv) fv.textContent = textoFinal;
+            if (fc) fc.textContent = itens === 1 ? '1 item' : `${itens} itens`;
 
-            totalDiv.innerHTML = `<span class="num-roll">${textoFinal}</span>`;
+            if (ultimoTotalExibido === textoFinal) return;
+            ultimoTotalExibido = textoFinal;
+            document.getElementById('total-geral').innerHTML = `<span class="num-roll">${textoFinal}</span>`;
         }
 
+        // ============================================================
+        // DADOS DO PEDIDO
+        // ============================================================
         function gatherData() {
+            const v = id => document.getElementById(id).value;
             const data = {
-                pedido: document.getElementById('pedido-num').value,
-                dataD: document.getElementById('data-d').value,
-                dataM: document.getElementById('data-m').value,
-                dataA: document.getElementById('data-a').value,
+                pedido: v('pedido-num'),
+                dataD: v('data-d'), dataM: v('data-m'), dataA: v('data-a'),
                 cliente: {
-                    nome: document.getElementById('cli-nome').value,
-                    tel: document.getElementById('cli-tel').value,
-                    end: document.getElementById('cli-end').value,
-                    bairro: document.getElementById('cli-bairro').value,
-                    mun: document.getElementById('cli-mun').value,
-                    uf: document.getElementById('cli-uf').value,
-                    cep: document.getElementById('cli-cep').value,
+                    nome: v('cli-nome'), tel: v('cli-tel'), end: v('cli-end'),
+                    bairro: v('cli-bairro'), mun: v('cli-mun'), uf: v('cli-uf'), cep: v('cli-cep'),
                 },
                 itens: []
             };
-
             tbody.querySelectorAll('tr').forEach(row => {
                 const q = row.querySelector('.item-q').value;
                 const d = row.querySelector('.item-d').value;
                 const p = row.querySelector('.item-p').value;
                 const t = row.querySelector('.item-t').value;
-                if(q || d || p || t) data.itens.push({q, d, p, t});
+                if (q || d || p || t) data.itens.push({ q, d, p, t });
             });
             return data;
         }
 
         function populateData(data) {
-            document.getElementById('pedido-num').value = data.pedido || '';
-            document.getElementById('data-d').value = data.dataD || '';
-            document.getElementById('data-m').value = data.dataM || '';
-            document.getElementById('data-a').value = data.dataA || '';
+            data = data || {};
+            const set = (id, val) => { document.getElementById(id).value = val || ''; };
+            set('pedido-num', data.pedido);
+            set('data-d', data.dataD); set('data-m', data.dataM); set('data-a', data.dataA);
+            set('cli-nome', data.cliente?.nome); set('cli-tel', data.cliente?.tel);
+            set('cli-end', data.cliente?.end);   set('cli-bairro', data.cliente?.bairro);
+            set('cli-mun', data.cliente?.mun);   set('cli-uf', data.cliente?.uf);
+            set('cli-cep', data.cliente?.cep);
 
-            document.getElementById('cli-nome').value = data.cliente?.nome || '';
-            document.getElementById('cli-tel').value = data.cliente?.tel || '';
-            document.getElementById('cli-end').value = data.cliente?.end || '';
-            document.getElementById('cli-bairro').value = data.cliente?.bairro || '';
-            document.getElementById('cli-mun').value = data.cliente?.mun || '';
-            document.getElementById('cli-uf').value = data.cliente?.uf || '';
-            document.getElementById('cli-cep').value = data.cliente?.cep || '';
-
+            const animAntes = animarLinhas;
+            animarLinhas = false;
             tbody.innerHTML = '';
-            if(data.itens && data.itens.length > 0) {
-                data.itens.forEach(item => addRow(item));
-            }
-
-            const currentRows = tbody.querySelectorAll('tr').length;
-            for(let i = currentRows; i < MIN_ROWS; i++) addRow();
+            if (Array.isArray(data.itens)) data.itens.forEach(item => addRow(item));
+            for (let i = tbody.children.length; i < MIN_ROWS; i++) addRow();
             addRow();
+            animarLinhas = animAntes;
 
+            // recalcula as linhas a partir de quant × preço (nunca de texto formatado)
+            tbody.querySelectorAll('tr').forEach(tr => updateRow(tr, false));
             ultimoTotalExibido = null;
             calculateGrandTotal();
         }
 
+        function setDefaultDate() {
+            const h = new Date();
+            document.getElementById('data-d').value = String(h.getDate()).padStart(2, '0');
+            document.getElementById('data-m').value = String(h.getMonth() + 1).padStart(2, '0');
+            document.getElementById('data-a').value = String(h.getFullYear());
+        }
+
+        // ============================================================
+        // RASCUNHO (autosave com debounce)
+        // ============================================================
+        let draftTimer = null;
+        let statusTimer = null;
+
+        function setStatus(txt) {
+            const el = document.getElementById('ux-status');
+            if (!el) return;
+            el.textContent = txt;
+            el.classList.add('show');
+            clearTimeout(statusTimer);
+            statusTimer = setTimeout(() => el.classList.remove('show'), 1400);
+        }
+
         function saveDraft() {
-            localStorage.setItem('pedido_draft', JSON.stringify(gatherData()));
+            dirty = true;
+            clearTimeout(draftTimer);
+            draftTimer = setTimeout(persistDraft, 300);
         }
 
-        function salvarPedidoNomeado() {
-            let nomeCliente = document.getElementById('cli-nome').value;
-            let nomePadrao = nomeCliente ? `Pedido - ${nomeCliente}` : "Novo Pedido";
+        function persistDraft() {
+            clearTimeout(draftTimer);
+            draftTimer = null;
+            if (lsSet(STORE.draft, gatherData())) setStatus('Rascunho salvo');
+        }
 
-            let nome = prompt("Dê um nome para salvar este pedido:", nomePadrao);
-            if (!nome) return;
+        document.addEventListener('visibilitychange', () => { if (document.hidden && draftTimer) persistDraft(); });
+        window.addEventListener('pagehide', () => { if (draftTimer) persistDraft(); });
 
-            let savedOrders = JSON.parse(localStorage.getItem('pedidos_lista') || '[]');
+        // ============================================================
+        // PEDIDOS SALVOS
+        // ============================================================
+        async function confirmarDescarte() {
+            if (!dirty) return true;
+            return uiDialog({
+                title: 'Alterações não salvas',
+                message: 'Existem alterações que ainda não foram salvas. Deseja descartá-las?',
+                ok: 'Descartar', danger: true, icon: 'fa-triangle-exclamation'
+            });
+        }
 
-            if(activeOrderId) {
-                let index = savedOrders.findIndex(o => o.id === activeOrderId);
-                if(index > -1) {
-                    savedOrders[index].name = nome;
-                    savedOrders[index].data = gatherData();
-                }
+        async function salvarPedidoNomeado() {
+            const lista = lsGet(STORE.list, []);
+            const existente = activeOrderId ? lista.find(o => o.id === activeOrderId) : null;
+            const cli = document.getElementById('cli-nome').value.trim();
+            const padrao = existente ? existente.name : (cli ? `Pedido - ${cli}` : 'Novo Pedido');
+
+            const nome = await uiDialog({
+                title: existente ? 'Atualizar pedido' : 'Salvar pedido',
+                message: 'Dê um nome para este pedido:',
+                input: true, value: padrao, ok: 'Salvar', icon: 'fa-floppy-disk'
+            });
+            if (nome === null) return;
+            const nm = nome.trim();
+            if (!nm) { toast('Informe um nome para salvar.', 'error'); return; }
+
+            const data = gatherData();
+            const agora = Date.now();
+            if (existente) {
+                existente.name = nm;
+                existente.data = data;
+                existente.updated = agora;
             } else {
-                activeOrderId = Date.now().toString();
-                savedOrders.push({
-                    id: activeOrderId,
-                    name: nome,
-                    data: gatherData()
-                });
+                activeOrderId = String(agora);
+                lista.push({ id: activeOrderId, name: nm, data, updated: agora });
             }
-
-            localStorage.setItem('pedidos_lista', JSON.stringify(savedOrders));
+            if (!lsSet(STORE.list, lista)) return;
+            lsSet(STORE.active, activeOrderId);
+            persistDraft();
+            dirty = false;
             renderSidebarList();
-            alert("Pedido Salvo com sucesso!");
+            toast(existente ? 'Pedido atualizado!' : 'Pedido salvo com sucesso!', 'success');
         }
 
-        function loadOrder(id) {
-            let savedOrders = JSON.parse(localStorage.getItem('pedidos_lista') || '[]');
-            let order = savedOrders.find(o => o.id === id);
-            if(order) {
-                activeOrderId = order.id;
-                populateData(order.data);
-                saveDraft();
-                closeSidebarMobile();
-            }
-        }
-
-        function deleteOrder(id, event) {
-            event.stopPropagation();
-            if(confirm("Tem certeza que deseja apagar este pedido?")) {
-                let savedOrders = JSON.parse(localStorage.getItem('pedidos_lista') || '[]');
-                savedOrders = savedOrders.filter(o => o.id !== id);
-                localStorage.setItem('pedidos_lista', JSON.stringify(savedOrders));
-
-                if(activeOrderId === id) novoPedido();
-                renderSidebarList();
-            }
-        }
-
-        function novoPedido() {
-            activeOrderId = null;
-            populateData({});
-            localStorage.removeItem('pedido_draft');
+        async function loadOrder(id) {
+            if (id !== activeOrderId && !(await confirmarDescarte())) return;
+            const order = lsGet(STORE.list, []).find(o => o.id === id);
+            if (!order) { toast('Pedido não encontrado.', 'error'); renderSidebarList(); return; }
+            activeOrderId = order.id;
+            lsSet(STORE.active, activeOrderId);
+            populateData(order.data);
+            persistDraft();
+            dirty = false;
+            renderSidebarList();
             closeSidebarMobile();
+            toast(`"${order.name}" carregado`, 'info', 1800);
+        }
+
+        async function deleteOrder(id, event) {
+            if (event) event.stopPropagation();
+            const ok = await uiDialog({
+                title: 'Apagar pedido', message: 'Tem certeza que deseja apagar este pedido? Esta ação não pode ser desfeita.',
+                ok: 'Apagar', danger: true, icon: 'fa-trash'
+            });
+            if (!ok) return;
+            const lista = lsGet(STORE.list, []).filter(o => o.id !== id);
+            lsSet(STORE.list, lista);
+            if (activeOrderId === id) await novoPedido(true);
+            renderSidebarList();
+            toast('Pedido apagado.', 'info', 1800);
+        }
+
+        async function novoPedido(force = false) {
+            if (force !== true && !(await confirmarDescarte())) return;
+            activeOrderId = null;
+            try { localStorage.removeItem(STORE.active); localStorage.removeItem(STORE.draft); } catch (e) {}
+            populateData({});
+            setDefaultDate();
+            dirty = false;
+            persistDraft();
+            renderSidebarList();
+            closeSidebarMobile();
+            const nome = document.getElementById('pedido-num');
+            if (window.innerWidth > 768) nome.focus();
+        }
+
+        function totalDoPedido(data) {
+            return (data?.itens || []).reduce((s, it) => {
+                const q = parseMoney(it.q), p = parseMoney(it.p);
+                return s + ((q > 0 && p > 0) ? arred(q * p) : 0);
+            }, 0);
         }
 
         function renderSidebarList() {
             const listDiv = document.getElementById('order-list');
+            const busca = (document.getElementById('ux-search-input')?.value || '').trim().toLowerCase();
+            const todos = lsGet(STORE.list, []);
+            const lista = todos.slice().reverse().filter(o =>
+                !busca || (o.name || '').toLowerCase().includes(busca) ||
+                (o.data?.cliente?.nome || '').toLowerCase().includes(busca) ||
+                String(o.data?.pedido || '').toLowerCase().includes(busca)
+            );
             listDiv.innerHTML = '';
-            let savedOrders = JSON.parse(localStorage.getItem('pedidos_lista') || '[]');
 
-            savedOrders.forEach(order => {
+            if (!lista.length) {
+                const vazio = document.createElement('div');
+                vazio.className = 'ux-empty';
+                vazio.innerHTML = '<i class="fas fa-folder-open"></i><span></span>';
+                vazio.querySelector('span').textContent = todos.length
+                    ? 'Nenhum pedido encontrado.'
+                    : 'Nenhum pedido salvo ainda. Preencha um pedido e toque em Salvar.';
+                listDiv.appendChild(vazio);
+                return;
+            }
+
+            lista.forEach(order => {
                 const div = document.createElement('div');
-                div.className = 'order-item';
+                div.className = 'order-item' + (order.id === activeOrderId ? ' ux-active' : '');
+                div.tabIndex = 0;
+                div.setAttribute('role', 'button');
                 div.onclick = () => loadOrder(order.id);
+                div.onkeydown = e => { if (e.key === 'Enter') loadOrder(order.id); };
 
-                div.innerHTML = `
-                    <span><i class="fas fa-file-alt"></i> ${order.name}</span>
-                    <button class="delete-btn" onclick="deleteOrder('${order.id}', event)">
-                        <i class="fas fa-times"></i>
-                    </button>
-                `;
+                const total = totalDoPedido(order.data);
+                const d = order.data || {};
+                const dataTxt = (d.dataD && d.dataM) ? `${d.dataD}/${d.dataM}${d.dataA ? '/' + d.dataA : ''}` : '';
+                const meta = [dataTxt, total > 0 ? formatMoneyDisplay(total, true) : ''].filter(Boolean).join(' · ');
+
+                const span = document.createElement('span');
+                const ic = document.createElement('i');
+                ic.className = 'fas fa-file-alt';
+                span.appendChild(ic);
+                span.appendChild(document.createTextNode(' ' + order.name));
+                if (meta) {
+                    const small = document.createElement('small');
+                    small.textContent = meta;
+                    span.appendChild(small);
+                }
+                span.title = order.name;
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'delete-btn';
+                btn.setAttribute('aria-label', 'Apagar pedido');
+                btn.innerHTML = '<i class="fas fa-times"></i>';
+                btn.addEventListener('click', e => deleteOrder(order.id, e));
+
+                div.appendChild(span);
+                div.appendChild(btn);
                 listDiv.appendChild(div);
             });
         }
 
-// ============================================================
-// GERAÇÃO DE PDF — VERSÃO CORRIGIDA (SEM CORTAR, ALTA QUALIDADE)
-// Usa html2canvas + jsPDF diretamente, medindo o elemento real
-// e distribuindo em múltiplas páginas A4 se necessário.
-// ============================================================
-
-function prepararCamposParaExport() {
-    document.querySelectorAll('input').forEach(inp => {
-        if (inp.type === 'checkbox') {
-            if (inp.checked) inp.setAttribute('checked', 'checked');
-            else inp.removeAttribute('checked');
-        } else {
-            inp.setAttribute('value', inp.value);
+        function setupSidebarSearch() {
+            const header = $('.sidebar-header');
+            if (!header || document.getElementById('ux-search-input')) return;
+            const wrap = document.createElement('div');
+            wrap.className = 'ux-search';
+            wrap.innerHTML = '<i class="fas fa-magnifying-glass"></i><input type="search" id="ux-search-input" placeholder="Buscar pedido..." autocomplete="off" aria-label="Buscar pedido">';
+            header.insertAdjacentElement('afterend', wrap);
+            wrap.querySelector('input').addEventListener('input', renderSidebarList);
         }
-    });
-}
 
-function aguardarRecursosProntos() {
-    const fontsReady = (document.fonts && document.fonts.ready)
-        ? document.fonts.ready
-        : Promise.resolve();
+        // ============================================================
+        // MÁSCARAS E COMPORTAMENTOS DOS CAMPOS
+        // ============================================================
+        function formatTel(v) {
+            const d = v.replace(/\D/g, '');
+            if (d.length === 11) return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+            if (d.length === 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+            if (d.length === 9)  return `${d.slice(0, 5)}-${d.slice(5)}`;
+            if (d.length === 8)  return `${d.slice(0, 4)}-${d.slice(4)}`;
+            return v;
+        }
+        function formatCep(v) {
+            const d = v.replace(/\D/g, '');
+            return d.length === 8 ? `${d.slice(0, 5)}-${d.slice(5)}` : v;
+        }
 
-    const imgs = Array.from(document.images || []);
-    const imgsReady = Promise.all(imgs.map(img => {
-        if (img.complete) return Promise.resolve();
-        return new Promise(resolve => {
-            img.addEventListener('load', resolve, { once: true });
-            img.addEventListener('error', resolve, { once: true });
-        });
-    }));
-
-    return Promise.race([
-        Promise.all([fontsReady, imgsReady]),
-        new Promise(resolve => setTimeout(resolve, 1500))
-    ]);
-}
-
-async function gerarPDFCompleto(scale, qualidadeImagem, sufixo, textoCarregando) {
-    const overlay = document.getElementById('loadingOverlay');
-    overlay.classList.add('active');
-    overlay.querySelector('.loading-text').textContent = textoCarregando;
-
-    const element = document.getElementById('folha-pedido');
-
-    try {
-        // 1. Garante que fontes/imagens carregaram
-        await aguardarRecursosProntos();
-        await new Promise(r => setTimeout(r, 300));
-
-        // 2. Prepara inputs para exportação
-        prepararCamposParaExport();
-
-        // 3. Aplica classe de modo PDF (ajusta estilos se houver)
-        element.classList.add('pdf-mode');
-        void element.offsetHeight;
-
-        // 4. Mede o elemento REAL (sem forçar tamanho fixo)
-        //    Pega a largura e altura verdadeiras do conteúdo
-        const rect = element.getBoundingClientRect();
-        const larguraReal = Math.ceil(element.scrollWidth || rect.width);
-        const alturaReal = Math.ceil(element.scrollHeight || rect.height);
-
-        // 5. Gera o canvas com html2canvas medindo o elemento real
-        const canvas = await html2canvas(element, {
-            scale: scale,                    // 3.0 = ~300 DPI
-            useCORS: true,
-            allowTaint: false,
-            logging: false,
-            scrollX: 0,
-            scrollY: 0,
-            windowWidth: larguraReal,        // largura REAL do elemento
-            windowHeight: alturaReal,        // altura REAL do elemento
-            width: larguraReal,              // força largura do canvas
-            height: alturaReal,              // força altura do canvas
-            backgroundColor: '#ffffff',
-            onclone: function(doc) {
-                // Garante que nada seja cortado no clone
-                doc.body.style.overflow = 'visible';
-                doc.documentElement.style.overflow = 'visible';
-                const el = doc.getElementById('folha-pedido');
-                if (el) {
-                    el.style.overflow = 'visible';
-                    el.style.height = 'auto';
-                    el.style.maxHeight = 'none';
+        function setupMasks() {
+            const d = $('#data-d'), m = $('#data-m'), a = $('#data-a');
+            [d, m, a].forEach(el => {
+                el.inputMode = 'numeric';
+                el.autocomplete = 'off';
+                el.addEventListener('input', () => {
+                    const c = el.value.replace(/\D/g, '');
+                    if (c !== el.value) el.value = c;
+                });
+                el.addEventListener('focus', () => setTimeout(() => { try { el.select(); } catch (e) {} }, 0));
+            });
+            d.addEventListener('input', e => {
+                if (d.value.length === 2 && e.inputType !== 'deleteContentBackward') {
+                    if (parseInt(d.value, 10) > 31) d.value = '31';
+                    m.focus();
                 }
-                // Remove qualquer transform/scale que possa cortar
-                doc.querySelectorAll('.paper-container, .page, .border-box').forEach(n => {
-                    n.style.overflow = 'visible';
-                    n.style.transform = 'none';
-                });
-            }
-        });
+            });
+            m.addEventListener('input', e => {
+                if (m.value.length === 2 && e.inputType !== 'deleteContentBackward') {
+                    if (parseInt(m.value, 10) > 12) m.value = '12';
+                    a.focus();
+                }
+            });
+            const pad = el => { if (el.value.length === 1 && el.value !== '0') { el.value = '0' + el.value; saveDraft(); } };
+            d.addEventListener('blur', () => pad(d));
+            m.addEventListener('blur', () => pad(m));
+            a.addEventListener('blur', () => { if (a.value.length === 2) { a.value = '20' + a.value; saveDraft(); } });
 
-        // 6. Configura PDF A4 em mm
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({
-            unit: 'mm',
-            format: 'a4',
-            orientation: 'portrait',
-            compress: true
-        });
+            const tel = $('#cli-tel');
+            tel.inputMode = 'tel';
+            tel.addEventListener('blur', () => { const f = formatTel(tel.value); if (f !== tel.value) { tel.value = f; saveDraft(); } });
 
-        const pdfLargura = pdf.internal.pageSize.getWidth();   // 210mm
-        const pdfAltura  = pdf.internal.pageSize.getHeight();  // 297mm
+            const cep = $('#cli-cep');
+            cep.inputMode = 'numeric';
+            cep.addEventListener('blur', () => { const f = formatCep(cep.value); if (f !== cep.value) { cep.value = f; saveDraft(); } });
 
-        // 7. Calcula proporções para caber na largura A4
-        const canvasLargura = canvas.width;
-        const canvasAltura  = canvas.height;
-        const imgLargura = pdfLargura;
-        const imgAltura  = (canvasAltura * pdfLargura) / canvasLargura;
-
-        // 8. Se couber em 1 página, adiciona direto. Senão, fatia.
-        const imgData = canvas.toDataURL('image/jpeg', qualidadeImagem);
-
-        if (imgAltura <= pdfAltura) {
-            // Cabe em 1 página — centraliza verticalmente se quiser
-            pdf.addImage(imgData, 'JPEG', 0, 0, imgLargura, imgAltura);
-        } else {
-            // Não cabe em 1 página → fatia em várias páginas SEM CORTAR
-            // Calcula quantas páginas são necessárias
-            const totalPaginas = Math.ceil(imgAltura / pdfAltura);
-
-            // Altura de cada "fatia" em pixels do canvas original
-            const fatiaAlturaPx = Math.floor(canvasLargura * (pdfAltura / pdfLargura));
-
-            let yOffsetPx = 0;
-
-            for (let i = 0; i < totalPaginas; i++) {
-                if (i > 0) pdf.addPage();
-
-                // Cria um canvas temporário para a fatia
-                const canvasFatia = document.createElement('canvas');
-                canvasFatia.width = canvasLargura;
-                const alturaRestante = canvasAltura - yOffsetPx;
-                const alturaFatia = Math.min(fatiaAlturaPx, alturaRestante);
-                canvasFatia.height = alturaFatia;
-
-                const ctx = canvasFatia.getContext('2d');
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, canvasFatia.width, canvasFatia.height);
-                ctx.drawImage(
-                    canvas,
-                    0, yOffsetPx,                    // origem
-                    canvasLargura, alturaFatia,      // tamanho origem
-                    0, 0,                            // destino
-                    canvasLargura, alturaFatia       // tamanho destino
-                );
-
-                const fatiaData = canvasFatia.toDataURL('image/jpeg', qualidadeImagem);
-                const fatiaAlturaMm = (alturaFatia * pdfLargura) / canvasLargura;
-
-                pdf.addImage(fatiaData, 'JPEG', 0, 0, pdfLargura, fatiaAlturaMm);
-
-                yOffsetPx += alturaFatia;
-            }
-        }
-
-        // 9. Salva
-        const nomeCli = (document.getElementById('cli-nome').value || 'Avulso').trim();
-        pdf.save(`WinPedidos7_${sufixo}_${nomeCli}.pdf`);
-
-    } catch (err) {
-        console.error('Erro ao gerar PDF:', err);
-        alert('Erro ao gerar PDF. Tente novamente. Se persistir, feche outros apps para liberar memória.');
-    } finally {
-        element.classList.remove('pdf-mode');
-        overlay.classList.remove('active');
-        overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
-    }
-}
-
-function gerarPDFAltaQualidade() {
-    // scale 3.0 ≈ 300 DPI em A4
-    gerarPDFCompleto(3.0, 0.98, '300DPI', 'Gerando PDF em alta qualidade...');
-}
-
-function gerarPDFBaixaQualidade() {
-    // scale 1.2 ≈ 72 DPI (arquivo leve)
-    gerarPDFCompleto(1.2, 0.75, '72DPI', 'Gerando PDF para visualização...');
-}
-
-        function gerarPNG() {
-            const overlay = document.getElementById('loadingOverlay');
-            overlay.classList.add('active');
-            overlay.querySelector('.loading-text').textContent = 'Gerando imagem PNG...';
-
-            const element = document.getElementById('folha-pedido');
-            const larguraCaptura = Math.max(
-                element.scrollWidth,
-                element.offsetWidth,
-                document.documentElement.clientWidth
-            );
-
-            aguardarRecursosProntos().then(() => new Promise(r => setTimeout(r, 250))).then(() => {
-                const nomeCli = (document.getElementById('cli-nome').value || 'Avulso').trim();
-
-                prepararCamposParaExport();
-
-                element.classList.add('pdf-mode');
-                void element.offsetHeight;
-
-                return html2canvas(element, {
-                    scale: 3.0,
-                    useCORS: true,
-                    allowTaint: false,
-                    logging: false,
-                    scrollX: 0,
-                    scrollY: 0,
-                    windowWidth: larguraCaptura,
-                    onclone: function(doc) {
-                        doc.body.style.overflow = 'visible';
-                        const el = doc.getElementById('folha-pedido');
-                        if (el) el.style.overflow = 'visible';
-                    }
-                }).then(canvas => {
-                    element.classList.remove('pdf-mode');
-                    overlay.classList.remove('active');
-                    overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
-
-                    // toBlob evita estourar limite de memória de data URLs
-                    // gigantes em navegadores Android (WebView/Chrome mobile).
-                    canvas.toBlob(blob => {
-                        if (!blob) {
-                            alert('Erro ao gerar PNG. Tente novamente com qualidade menor.');
-                            return;
-                        }
-                        const url = URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.download = `WinPedidos7_${nomeCli}.png`;
-                        link.href = url;
-                        link.click();
-                        setTimeout(() => URL.revokeObjectURL(url), 2000);
-                    }, 'image/png', 1.0);
-                });
-            }).catch((err) => {
-                console.error('Erro ao gerar PNG:', err);
-                element.classList.remove('pdf-mode');
-                overlay.classList.remove('active');
-                alert('Erro ao gerar PNG. Tente novamente. Se o problema persistir, feche outros apps para liberar memória do celular.');
-                overlay.querySelector('.loading-text').textContent = 'Gerando documento...';
+            const uf = $('#cli-uf');
+            uf.autocapitalize = 'characters';
+            uf.addEventListener('input', () => {
+                const f = uf.value.replace(/[^a-zA-Z]/g, '').toUpperCase();
+                if (f !== uf.value) uf.value = f;
             });
         }
 
-        window.onload = () => {
-            renderSidebarList();
-            const draft = localStorage.getItem('pedido_draft');
-            if (draft) {
-                populateData(JSON.parse(draft));
+        // ============================================================
+        // TECLADO, GESTOS E TOTAL FLUTUANTE
+        // ============================================================
+        function setupKeyboard() {
+            // Enter avança para o próximo campo (Shift+Enter volta)
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && e.target instanceof HTMLInputElement && e.target.closest('#folha-pedido')) {
+                    e.preventDefault();
+                    const campos = Array.from(document.querySelectorAll('#folha-pedido input:not([readonly])'));
+                    const i = campos.indexOf(e.target);
+                    const alvo = campos[i + (e.shiftKey ? -1 : 1)];
+                    if (alvo) alvo.focus();
+                    else e.target.blur();
+                    return;
+                }
+
+                const mod = e.ctrlKey || e.metaKey;
+                if (mod && e.key.toLowerCase() === 's') { e.preventDefault(); salvarPedidoNomeado(); }
+                else if (e.altKey && e.key.toLowerCase() === 'n') { e.preventDefault(); novoPedido(); }
+                else if (e.altKey && e.key.toLowerCase() === 'f') { e.preventDefault(); toggleFullscreen(); }
+                else if (e.key === 'Escape') {
+                    document.getElementById('sidebar').classList.remove('active');
+                    document.body.classList.remove('show-bar');
+                }
+            });
+        }
+
+        function setupSidebarGestures() {
+            let tx = 0, ty = 0, rastreando = false;
+            document.addEventListener('touchstart', e => {
+                if (window.innerWidth > 768 || e.touches.length !== 1) return;
+                tx = e.touches[0].clientX; ty = e.touches[0].clientY; rastreando = true;
+            }, { passive: true });
+            document.addEventListener('touchend', e => {
+                if (!rastreando) return;
+                rastreando = false;
+                const t = e.changedTouches[0];
+                const dx = t.clientX - tx, dy = t.clientY - ty;
+                if (Math.abs(dx) < 70 || Math.abs(dy) > Math.abs(dx) * 0.6) return;
+                const sb = document.getElementById('sidebar');
+                if (dx > 0 && tx < 28) sb.classList.add('active');
+                else if (dx < 0 && sb.classList.contains('active')) sb.classList.remove('active');
+            }, { passive: true });
+        }
+
+        function setupFloatTotal() {
+            const flutuante = document.getElementById('ux-total');
+            const rodape = $('.footer-section');
+            if (!flutuante || !rodape || !('IntersectionObserver' in window)) return;
+            new IntersectionObserver(entries => {
+                flutuante.classList.toggle('show', !entries[0].isIntersecting);
+            }, { threshold: 0.05 }).observe(rodape);
+        }
+
+        // ============================================================
+        // EXPORTAÇÃO (PDF / PNG)
+        // ============================================================
+        function prepararCamposParaExport() {
+            document.querySelectorAll('input').forEach(inp => {
+                if (inp.type === 'checkbox') {
+                    if (inp.checked) inp.setAttribute('checked', 'checked');
+                    else inp.removeAttribute('checked');
+                } else {
+                    inp.setAttribute('value', inp.value);
+                }
+            });
+        }
+
+        function aguardarRecursosProntos() {
+            const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+            const imgs = Array.from(document.images || []);
+            const imgsReady = Promise.all(imgs.map(img => {
+                if (img.complete) return Promise.resolve();
+                return new Promise(resolve => {
+                    img.addEventListener('load', resolve, { once: true });
+                    img.addEventListener('error', resolve, { once: true });
+                });
+            }));
+            return Promise.race([
+                Promise.all([fontsReady, imgsReady]),
+                new Promise(resolve => setTimeout(resolve, 1500))
+            ]);
+        }
+
+        const esperar = ms => new Promise(r => setTimeout(r, ms));
+        const proximoFrame = () => new Promise(r => requestAnimationFrame(() => setTimeout(r, 30)));
+
+        function setOverlayTexto(txt) {
+            const el = document.querySelector('#loadingOverlay .loading-text');
+            if (el) el.textContent = txt;
+        }
+
+        function nomeArquivo(sufixo, ext) {
+            const limpa = s => (s || '').trim().replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, '_');
+            const nome = limpa(document.getElementById('cli-nome').value) || 'Avulso';
+            const num = limpa(document.getElementById('pedido-num').value);
+            return `WinPedidos7_${sufixo ? sufixo + '_' : ''}${num ? num + '_' : ''}${nome}.${ext}`;
+        }
+
+        // Evita estourar o limite de canvas (principalmente iOS/Android)
+        function escalaSegura(scale) {
+            const itens = gatherData().itens.length;
+            const paginas = Math.max(1, Math.ceil((itens + 1) / 20));
+            const hEst = 1123 * paginas * 1.15;
+            const touch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+            const maxArea = touch ? 14e6 : 80e6;
+            return Math.max(1, Math.min(scale, Math.sqrt(maxArea / (EXPORT_W * hEst))));
+        }
+
+        /**
+         * Ajusta o DOCUMENTO CLONADO (nunca a tela do usuário):
+         *  - força layout de papel A4 (mesmo no celular, sem o layout "cartão")
+         *  - aumenta a fonte
+         *  - remove linhas vazias do fim se isso evitar uma página extra
+         *  - registra os pontos seguros de quebra de página (entre linhas)
+         */
+        function prepararClone(doc, breaks) {
+            const el = doc.getElementById('folha-pedido');
+            if (!el) return;
+            const win = doc.defaultView;
+
+            // 1. libera overflow/altura dos ancestrais para nada ser cortado
+            for (let n = el; n; n = n.parentElement) {
+                n.style.overflow = 'visible';
+                n.style.maxHeight = 'none';
+                n.style.transform = 'none';
+            }
+            doc.documentElement.style.height = 'auto';
+            doc.body.style.height = 'auto';
+
+            // 2. largura fixa de papel A4
+            el.style.width = EXPORT_W + 'px';
+            el.style.maxWidth = 'none';
+            el.style.minWidth = '0';
+            el.style.margin = '0';
+            el.style.zoom = '1';
+
+            // 3. aumenta a fonte (lê tudo primeiro, escreve depois: sem efeito cascata)
+            const todos = [el, ...el.querySelectorAll('*')];
+            const info = todos.map(n => {
+                const cs = win.getComputedStyle(n);
+                return {
+                    n,
+                    fs: parseFloat(cs.fontSize) || 0,
+                    h: (n.tagName === 'INPUT' || n.classList.contains('total-value')) ? parseFloat(cs.height) || 0 : 0
+                };
+            });
+            const fatorAltura = 1 + (PDF_FONT_FACTOR - 1) * 0.6;
+            info.forEach(({ n, fs, h }) => {
+                if (fs) n.style.fontSize = (fs * PDF_FONT_FACTOR) + 'px';
+                if (h) n.style.height = (h * fatorAltura) + 'px';
+            });
+
+            // 4. se algum texto ficou maior que o campo, reduz só o necessário
+            el.querySelectorAll('input').forEach(inp => {
+                let s = parseFloat(inp.style.fontSize);
+                if (!s) return;
+                const min = (s / PDF_FONT_FACTOR) * 0.8;
+                let guard = 0;
+                while (inp.scrollWidth > inp.clientWidth + 1 && s > min && guard++ < 24) {
+                    s -= 0.5;
+                    inp.style.fontSize = s + 'px';
+                }
+            });
+
+            // 5. remove linhas vazias do final se isso evitar uma página extra
+            const alturaA4 = () => el.getBoundingClientRect().width * 297 / 210;
+            const vazia = tr => Array.from(tr.querySelectorAll('input')).every(i => !i.value.trim());
+            let linhas = Array.from(el.querySelectorAll('#items-body tr'));
+            while (linhas.length > 1 && el.getBoundingClientRect().height > alturaA4() && vazia(linhas[linhas.length - 1])) {
+                linhas.pop().remove();
+            }
+
+            // 6. pontos de quebra seguros (fim de cada linha, em px CSS relativos ao topo)
+            const topo = el.getBoundingClientRect().top;
+            linhas.forEach(tr => breaks.push(tr.getBoundingClientRect().bottom - topo));
+        }
+
+        async function capturarFolha(scale) {
+            const element = document.getElementById('folha-pedido');
+            const breaks = [];
+            const canvas = await html2canvas(element, {
+                scale,
+                useCORS: true,
+                allowTaint: false,
+                logging: false,
+                scrollX: 0,
+                scrollY: 0,
+                windowWidth: 1200,                         // >768px: nunca usa o layout de celular
+                windowHeight: Math.max(window.innerHeight, 3000),
+                backgroundColor: '#ffffff',
+                onclone: doc => prepararClone(doc, breaks)
+            });
+            return { canvas, breaks, scale };
+        }
+
+        async function renderComRetry(scaleDesejada) {
+            let s = escalaSegura(scaleDesejada);
+            let ultimoErro = null;
+            for (let i = 0; i < 3; i++) {
+                try {
+                    const r = await capturarFolha(s);
+                    if (r.canvas.width > 0 && r.canvas.height > 0) return r;
+                } catch (e) { ultimoErro = e; }
+                s = Math.max(1, s * 0.75);
+                setOverlayTexto('Ajustando qualidade para o aparelho...');
+                await proximoFrame();
+            }
+            throw ultimoErro || new Error('Canvas vazio');
+        }
+
+        async function comOverlay(texto, tarefa) {
+            if (exporting) return;
+            exporting = true;
+            document.body.classList.add('exporting');
+            const overlay = document.getElementById('loadingOverlay');
+            const element = document.getElementById('folha-pedido');
+            setOverlayTexto(texto);
+            overlay.classList.add('active');
+            try {
+                if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+                if (draftTimer) persistDraft();
+                await proximoFrame();
+                await aguardarRecursosProntos();
+                await esperar(250);
+                prepararCamposParaExport();
+                element.classList.add('pdf-mode');
+                void element.offsetHeight;
+                await tarefa();
+            } catch (err) {
+                console.error('Erro na exportação:', err);
+                toast('Erro ao gerar o arquivo. Tente novamente ou feche outros apps para liberar memória.', 'error', 5500);
+            } finally {
+                element.classList.remove('pdf-mode');
+                overlay.classList.remove('active');
+                setOverlayTexto('Gerando documento...');
+                document.body.classList.remove('exporting');
+                exporting = false;
+            }
+        }
+
+        async function gerarPDFCompleto(scale, qualidade, sufixo, texto) {
+            await comOverlay(texto, async () => {
+                const r = await renderComRetry(scale);
+                setOverlayTexto('Montando PDF...');
+                await proximoFrame();
+
+                const JsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+                if (!JsPDF) throw new Error('jsPDF não carregou (verifique a conexão).');
+
+                const pdf = new JsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+                const pdfL = pdf.internal.pageSize.getWidth();
+                const pdfA = pdf.internal.pageSize.getHeight();
+                const { canvas, breaks } = r;
+
+                // Pagina SEM cortar linhas ao meio
+                const paginaPx = Math.floor(canvas.width * pdfA / pdfL);
+                const quebras = breaks.map(b => Math.round(b * r.scale)).sort((a, b) => a - b);
+                const cortes = [];
+                let ini = 0;
+                while (ini < canvas.height - 2) {
+                    let fim = ini + paginaPx;
+                    if (fim >= canvas.height) {
+                        fim = canvas.height;
+                    } else {
+                        const cand = quebras.filter(b => b > ini + paginaPx * 0.5 && b <= fim);
+                        if (cand.length) fim = cand[cand.length - 1];
+                    }
+                    cortes.push([ini, fim]);
+                    ini = fim;
+                }
+
+                cortes.forEach(([y0, y1], idx) => {
+                    if (idx > 0) pdf.addPage();
+                    const alt = y1 - y0;
+                    const fatia = document.createElement('canvas');
+                    fatia.width = canvas.width;
+                    fatia.height = alt;
+                    const ctx = fatia.getContext('2d');
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, fatia.width, fatia.height);
+                    ctx.drawImage(canvas, 0, y0, canvas.width, alt, 0, 0, canvas.width, alt);
+                    pdf.addImage(fatia.toDataURL('image/jpeg', qualidade), 'JPEG', 0, 0, pdfL, (alt * pdfL) / canvas.width, undefined, 'FAST');
+                    fatia.width = fatia.height = 0;
+                });
+                canvas.width = canvas.height = 0;
+
+                pdf.save(nomeArquivo(sufixo, 'pdf'));
+                toast(cortes.length > 1 ? `PDF gerado (${cortes.length} páginas)` : 'PDF gerado!', 'success');
+            });
+        }
+
+        function gerarPDFAltaQualidade() {
+            gerarPDFCompleto(3.0, 0.98, '300DPI', 'Gerando PDF em alta qualidade...');
+        }
+
+        function gerarPDFBaixaQualidade() {
+            gerarPDFCompleto(1.5, 0.8, '72DPI', 'Gerando PDF para visualização...');
+        }
+
+        async function gerarPNG() {
+            await comOverlay('Gerando imagem PNG...', async () => {
+                const r = await renderComRetry(3.0);
+                // toBlob evita estourar o limite de data URLs gigantes no celular
+                const blob = await new Promise(res => r.canvas.toBlob(res, 'image/png', 1.0));
+                r.canvas.width = r.canvas.height = 0;
+                if (!blob) throw new Error('Falha ao criar PNG');
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.download = nomeArquivo('', 'png');
+                link.href = url;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 4000);
+                toast('Imagem PNG gerada!', 'success');
+            });
+        }
+
+        // ============================================================
+        // INICIALIZAÇÃO
+        // ============================================================
+        function init() {
+            setupSidebarSearch();
+            setupMasks();
+            setupKeyboard();
+            setupSidebarGestures();
+            setupFloatTotal();
+            syncFullscreenUI(false);
+
+            const lista = lsGet(STORE.list, []);
+            const ativo = lsGet(STORE.active, null);
+            activeOrderId = lista.some(o => o.id === ativo) ? ativo : null;
+
+            const draft = lsGet(STORE.draft, null);
+            if (draft && typeof draft === 'object') {
+                populateData(draft);
             } else {
                 populateData({});
+                setDefaultDate();
             }
-        };
+            renderSidebarList();
+            animarLinhas = true;
+        }
+
+        init();
     </script>
 </body>
 </html>
