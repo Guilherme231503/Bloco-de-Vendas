@@ -652,12 +652,42 @@
         // ============================================================
         // LÓGICA PRINCIPAL DO PEDIDO
         // ============================================================
+        // ============================================================
+        // VERSÃO / LOG NO CONSOLE
+        // ============================================================
+        const APP_VERSION = '2.3.0';
+        const APP_BUILD = '2026-10-24';
+        const APP_CHANGELOG = [
+            ['2.3.0', 'PNG: fonte 60% maior (!important vence o CSS do tema), altura livre, total e textos sem corte, topo não é mais cortado'],
+            ['2.2.0', 'PNG via html-to-image em iframe de 1200px (layout de PC), com plano B em html2canvas'],
+            ['2.1.0', 'PDF: fonte 20% maior, layout A4 no celular, quebra de página entre linhas, retry de qualidade'],
+            ['2.0.0', 'Tela cheia/modo foco, total flutuante, diálogos e toasts, busca de pedidos, máscaras, atalhos, correção de bugs']
+        ];
+
+        function logVersao() {
+            const estiloTitulo = 'background:#2563eb;color:#fff;padding:3px 8px;border-radius:4px;font-weight:700';
+            const estiloInfo = 'color:#2563eb;font-weight:600';
+            console.log(`%cPedidos v${APP_VERSION}%c build ${APP_BUILD}`, estiloTitulo, estiloInfo);
+            console.groupCollapsed('Histórico de versões');
+            APP_CHANGELOG.forEach(([v, desc]) => console.log(`%cv${v}%c ${desc}`, 'font-weight:700;color:#2563eb', ''));
+            console.groupEnd();
+            console.groupCollapsed('Ambiente');
+            console.log('Tela cheia nativa:', !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen));
+            console.log('Toque:', ('ontouchstart' in window) || navigator.maxTouchPoints > 0);
+            console.log('Viewport:', `${window.innerWidth}x${window.innerHeight} @${window.devicePixelRatio}x`);
+            console.log('html2canvas:', typeof html2canvas !== 'undefined' ? 'ok' : 'não carregou');
+            console.log('jsPDF:', (window.jspdf && window.jspdf.jsPDF) || window.jsPDF ? 'ok' : 'não carregou');
+            console.log('CSS por dispositivo:', Array.from(document.querySelectorAll('link[href*="css/"]')).map(l => l.getAttribute('href')).join(', ') || 'nenhum');
+            console.groupEnd();
+        }
+        window.APP_VERSION = APP_VERSION;
+
         const $ = (sel, root = document) => root.querySelector(sel);
         const tbody = document.getElementById('items-body');
         const MIN_ROWS = 15;
         const EXPORT_W = 794;            // largura A4 em px (96 dpi) usada na exportação
         const PDF_FONT_FACTOR = 1.2;     // aumento da fonte no PDF
-        const PNG_FONT_FACTOR = 1.4;     // aumento da fonte no PNG
+        const PNG_FONT_FACTOR = 1.6;     // aumento da fonte no PNG
         const HTI_URL = 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js';
         const STORE = { draft: 'pedido_draft', list: 'pedidos_lista', active: 'pedido_active_id' };
 
@@ -1390,60 +1420,101 @@
             if (!el) return;
             const win = doc.defaultView;
 
-            // 1. libera overflow/altura dos ancestrais para nada ser cortado
-            for (let n = el; n; n = n.parentElement) {
-                n.style.overflow = 'visible';
-                n.style.maxHeight = 'none';
-                n.style.transform = 'none';
+            const imp = (n, prop, val) => n.style.setProperty(prop, val, 'important');
+
+            // 1. ancestrais: sem overflow escondido, sem centralização que corta o topo
+            for (let n = el.parentElement; n; n = n.parentElement) {
+                imp(n, 'overflow', 'visible');
+                imp(n, 'height', 'auto');
+                imp(n, 'min-height', '0');
+                imp(n, 'max-height', 'none');
+                imp(n, 'transform', 'none');
+                imp(n, 'display', 'block');
+                imp(n, 'align-items', 'normal');
+                imp(n, 'justify-content', 'flex-start');
+                if (n !== doc.documentElement && n !== doc.body) imp(n, 'position', 'static');
             }
-            doc.documentElement.style.height = 'auto';
-            doc.body.style.height = 'auto';
 
-            // 2. largura fixa de papel A4
-            el.style.width = EXPORT_W + 'px';
-            el.style.maxWidth = 'none';
-            el.style.minWidth = '0';
-            el.style.margin = '0';
-            el.style.zoom = '1';
+            // 2. folha: largura A4 e ALTURA LIVRE (fonte maior = folha mais alta, nada cortado)
+            imp(el, 'width', EXPORT_W + 'px');
+            imp(el, 'max-width', 'none');
+            imp(el, 'min-width', '0');
+            imp(el, 'margin', '0');
+            imp(el, 'zoom', '1');
+            imp(el, 'transform', 'none');
+            imp(el, 'top', '0'); imp(el, 'left', '0');
+            imp(el, 'height', 'auto');
+            imp(el, 'max-height', 'none');
+            imp(el, 'overflow', 'visible');
+            el.querySelectorAll('.border-box, .items-section, .footer-section, .footer-right, .footer-left, .header-section, .flex-row, .col, .pedido-box, .data-box, .data-inputs, table, thead, tbody, tr, th, td, .label, .total-label').forEach(n => {
+                imp(n, 'overflow', 'visible');
+                imp(n, 'text-overflow', 'clip');
+                imp(n, 'max-height', 'none');
+            });
+            ['.border-box', '.items-section', '.footer-section', '.footer-right'].forEach(sel => {
+                const n = el.querySelector(sel);
+                if (n) { imp(n, 'height', 'auto'); }
+            });
 
-            // 3. aumenta a fonte (lê tudo primeiro, escreve depois: sem efeito cascata)
+            // 3. aumenta a fonte (lê tudo primeiro, escreve depois). !important vence o CSS do tema
             const todos = [el, ...el.querySelectorAll('*')];
             const info = todos.map(n => {
                 const cs = win.getComputedStyle(n);
                 return {
                     n,
                     fs: parseFloat(cs.fontSize) || 0,
-                    h: (n.tagName === 'INPUT' || n.classList.contains('total-value')) ? parseFloat(cs.height) || 0 : 0
+                    h: n.tagName === 'INPUT' ? parseFloat(cs.height) || 0 : 0
                 };
             });
             const fatorAltura = 1 + (fator - 1) * 0.6;
             info.forEach(({ n, fs, h }) => {
-                if (fs) n.style.fontSize = (fs * fator) + 'px';
-                if (h) n.style.height = (h * fatorAltura) + 'px';
+                if (fs) imp(n, 'font-size', (fs * fator) + 'px');
+                if (h) imp(n, 'height', Math.max(h * fatorAltura, fs * fator * 1.6) + 'px');
             });
+
+            // total geral: nunca cortar o valor
+            const tv = el.querySelector('.total-value');
+            if (tv) {
+                const num = tv.querySelector('.num-roll');
+                imp(tv, 'overflow', 'visible');
+                imp(tv, 'width', 'auto');
+                imp(tv, 'min-width', '0');
+                imp(tv, 'max-width', 'none');
+                imp(tv, 'height', 'auto');
+                imp(tv, 'white-space', 'nowrap');
+                imp(tv, 'line-height', '1.35');
+                imp(tv, 'text-overflow', 'clip');
+                imp(tv, 'padding-bottom', '2px');
+                if (num) { imp(num, 'transform', 'none'); imp(num, 'opacity', '1'); imp(num, 'filter', 'none'); }
+            }
+            const fr = el.querySelector('.footer-right');
+            if (fr) { imp(fr, 'flex-wrap', 'wrap'); imp(fr, 'justify-content', 'flex-end'); imp(fr, 'width', 'auto'); imp(fr, 'max-width', '100%'); }
+            const fs2 = el.querySelector('.footer-section');
+            if (fs2) { imp(fs2, 'flex-wrap', 'wrap'); }
 
             // 4. texto maior que o campo: reduz um pouco; se ainda não couber, quebra em várias linhas
             el.querySelectorAll('input').forEach(inp => {
                 let s = parseFloat(inp.style.fontSize);
                 if (!s) return;
-                const min = (s / fator) * 0.9;
+                const min = (s / fator) * 0.95;
                 let guard = 0;
                 while (inp.scrollWidth > inp.clientWidth + 1 && s > min && guard++ < 24) {
                     s -= 0.5;
-                    inp.style.fontSize = s + 'px';
+                    imp(inp, 'font-size', s + 'px');
                 }
                 if (inp.scrollWidth > inp.clientWidth + 1 && inp.value.trim()) {
                     const cs = win.getComputedStyle(inp);
                     const div = doc.createElement('div');
                     div.className = inp.className;
                     div.textContent = inp.value;
-                    Object.assign(div.style, {
-                        boxSizing: 'border-box', width: '100%', height: 'auto',
-                        fontFamily: cs.fontFamily, fontWeight: cs.fontWeight, fontSize: cs.fontSize,
-                        color: cs.color, textAlign: cs.textAlign, padding: cs.padding,
-                        background: cs.backgroundColor, border: cs.border,
-                        whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.2'
-                    });
+                    const css = {
+                        'box-sizing': 'border-box', 'width': '100%', 'height': 'auto',
+                        'font-family': cs.fontFamily, 'font-weight': cs.fontWeight, 'font-size': cs.fontSize,
+                        'color': cs.color, 'text-align': cs.textAlign, 'padding': cs.padding,
+                        'background': cs.backgroundColor, 'border': cs.border,
+                        'white-space': 'normal', 'word-break': 'break-word', 'line-height': '1.25'
+                    };
+                    Object.keys(css).forEach(k => imp(div, k, css[k]));
                     inp.replaceWith(div);
                 }
             });
@@ -1743,6 +1814,7 @@
         }
 
         init();
+        logVersao();
     </script>
 </body>
 </html>
