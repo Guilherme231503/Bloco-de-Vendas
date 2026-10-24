@@ -656,7 +656,9 @@
         const tbody = document.getElementById('items-body');
         const MIN_ROWS = 15;
         const EXPORT_W = 794;            // largura A4 em px (96 dpi) usada na exportação
-        const PDF_FONT_FACTOR = 1.2;     // aumento da fonte no PDF/PNG
+        const PDF_FONT_FACTOR = 1.2;     // aumento da fonte no PDF
+        const PNG_FONT_FACTOR = 1.4;     // aumento da fonte no PNG
+        const HTI_URL = 'https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js';
         const STORE = { draft: 'pedido_draft', list: 'pedidos_lista', active: 'pedido_active_id' };
 
         let activeOrderId = null;
@@ -1382,7 +1384,8 @@
          *  - remove linhas vazias do fim se isso evitar uma página extra
          *  - registra os pontos seguros de quebra de página (entre linhas)
          */
-        function prepararClone(doc, breaks) {
+        function prepararClone(doc, breaks, opts = {}) {
+            const fator = opts.fator || PDF_FONT_FACTOR;
             const el = doc.getElementById('folha-pedido');
             if (!el) return;
             const win = doc.defaultView;
@@ -1413,23 +1416,39 @@
                     h: (n.tagName === 'INPUT' || n.classList.contains('total-value')) ? parseFloat(cs.height) || 0 : 0
                 };
             });
-            const fatorAltura = 1 + (PDF_FONT_FACTOR - 1) * 0.6;
+            const fatorAltura = 1 + (fator - 1) * 0.6;
             info.forEach(({ n, fs, h }) => {
-                if (fs) n.style.fontSize = (fs * PDF_FONT_FACTOR) + 'px';
+                if (fs) n.style.fontSize = (fs * fator) + 'px';
                 if (h) n.style.height = (h * fatorAltura) + 'px';
             });
 
-            // 4. se algum texto ficou maior que o campo, reduz só o necessário
+            // 4. texto maior que o campo: reduz um pouco; se ainda não couber, quebra em várias linhas
             el.querySelectorAll('input').forEach(inp => {
                 let s = parseFloat(inp.style.fontSize);
                 if (!s) return;
-                const min = (s / PDF_FONT_FACTOR) * 0.8;
+                const min = (s / fator) * 0.9;
                 let guard = 0;
                 while (inp.scrollWidth > inp.clientWidth + 1 && s > min && guard++ < 24) {
                     s -= 0.5;
                     inp.style.fontSize = s + 'px';
                 }
+                if (inp.scrollWidth > inp.clientWidth + 1 && inp.value.trim()) {
+                    const cs = win.getComputedStyle(inp);
+                    const div = doc.createElement('div');
+                    div.className = inp.className;
+                    div.textContent = inp.value;
+                    Object.assign(div.style, {
+                        boxSizing: 'border-box', width: '100%', height: 'auto',
+                        fontFamily: cs.fontFamily, fontWeight: cs.fontWeight, fontSize: cs.fontSize,
+                        color: cs.color, textAlign: cs.textAlign, padding: cs.padding,
+                        background: cs.backgroundColor, border: cs.border,
+                        whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.2'
+                    });
+                    inp.replaceWith(div);
+                }
             });
+
+            if (opts.paginar === false) return;
 
             // 5. remove linhas vazias do final se isso evitar uma página extra
             const alturaA4 = () => el.getBoundingClientRect().width * 297 / 210;
@@ -1566,12 +1585,124 @@
             gerarPDFCompleto(1.5, 0.8, '72DPI', 'Gerando PDF para visualização...');
         }
 
+        // ---------- PNG com html-to-image (renderização nativa do navegador) ----------
+        function carregarScriptEm(doc, src, timeout = 15000) {
+            return new Promise((resolve, reject) => {
+                const s = doc.createElement('script');
+                const t = setTimeout(() => reject(new Error('Tempo esgotado ao carregar html-to-image')), timeout);
+                s.onload = () => { clearTimeout(t); resolve(); };
+                s.onerror = () => { clearTimeout(t); reject(new Error('Falha ao carregar html-to-image')); };
+                s.src = src;
+                doc.head.appendChild(s);
+            });
+        }
+
+        // Cria um iframe invisível de 1200px (layout de PC, nunca o de celular) com uma cópia da folha
+        async function criarSandbox() {
+            const iframe = document.createElement('iframe');
+            iframe.setAttribute('aria-hidden', 'true');
+            iframe.tabIndex = -1;
+            iframe.style.cssText = 'position:fixed;left:-20000px;top:0;width:1200px;height:3000px;border:0;opacity:0;pointer-events:none;';
+            document.body.appendChild(iframe);
+
+            const d = iframe.contentDocument;
+            d.open();
+            d.write('<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"></head><body></body></html>');
+            d.close();
+
+            // copia TODOS os estilos da página (inclusive o CSS dinâmico por dispositivo)
+            const pend = [];
+            document.querySelectorAll('link[rel~="stylesheet"], style').forEach(n => {
+                const c = n.cloneNode(true);
+                if (n.tagName === 'LINK') {
+                    c.href = n.href;
+                    try { if (new URL(n.href, location.href).origin !== location.origin) c.crossOrigin = 'anonymous'; } catch (e) {}
+                    pend.push(new Promise(r => { c.onload = r; c.onerror = r; }));
+                }
+                d.head.appendChild(c);
+            });
+            await Promise.race([Promise.all(pend), esperar(6000)]);
+
+            d.body.className = document.body.className.replace(/\b(exporting|is-fullscreen|show-bar)\b/g, '').trim();
+            d.documentElement.style.height = 'auto';
+            d.body.style.cssText = 'height:auto;min-height:0;overflow:visible;margin:0;';
+
+            const main = d.createElement('main');
+            main.className = 'main-area';
+            main.style.cssText = 'height:auto;min-height:0;overflow:visible;width:auto;margin:0;';
+            const paper = d.createElement('div');
+            paper.className = 'paper-container';
+            paper.style.cssText = 'height:auto;min-height:0;max-height:none;overflow:visible;padding:0;margin:0;';
+            const clone = document.getElementById('folha-pedido').cloneNode(true);
+            clone.classList.add('pdf-mode');
+            paper.appendChild(clone);
+            main.appendChild(paper);
+            d.body.appendChild(main);
+
+            try { await Promise.race([d.fonts.ready, esperar(3000)]); } catch (e) {}
+            try { await d.fonts.load('900 1em "Font Awesome 6 Free"'); } catch (e) {}
+            await esperar(250);
+            return iframe;
+        }
+
+        async function capturarPNGHtmlToImage() {
+            const iframe = await criarSandbox();
+            try {
+                const d = iframe.contentDocument;
+                prepararClone(d, null, { fator: PNG_FONT_FACTOR, paginar: false });
+                await carregarScriptEm(d, HTI_URL);
+                const hti = iframe.contentWindow.htmlToImage;
+                if (!hti) throw new Error('html-to-image indisponível');
+
+                const el = d.getElementById('folha-pedido');
+                const rect = el.getBoundingClientRect();
+                const W = Math.ceil(Math.max(rect.width, el.scrollWidth));
+                const H = Math.ceil(Math.max(rect.height, el.scrollHeight)) + 2;
+
+                // limita a resolução para o aparelho aguentar
+                const touch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+                const maxArea = touch ? 14e6 : 80e6;
+                const ratio = Math.max(1, Math.min(3, Math.sqrt(maxArea / (W * H)), 16000 / Math.max(W, H)));
+
+                const opts = { pixelRatio: ratio, backgroundColor: '#ffffff', cacheBust: true, width: W, height: H, style: { margin: '0', transform: 'none' } };
+                setOverlayTexto('Renderizando imagem...');
+                await proximoFrame();
+                try { await hti.toCanvas(el, { ...opts, pixelRatio: 1 }); } catch (e) {}   // aquece fontes/ícones
+                const blob = await hti.toBlob(el, opts);
+                if (!blob || blob.size < 8000) throw new Error('Imagem vazia');
+                return blob;
+            } finally {
+                iframe.remove();
+            }
+        }
+
+        // Plano B: html2canvas (caso o html-to-image não carregue, p.ex. sem internet)
+        async function capturarPNGHtml2Canvas() {
+            const element = document.getElementById('folha-pedido');
+            const canvas = await html2canvas(element, {
+                scale: escalaSegura(3.0),
+                useCORS: true, allowTaint: false, logging: false,
+                scrollX: 0, scrollY: 0,
+                windowWidth: 1200, windowHeight: Math.max(window.innerHeight, 3000),
+                backgroundColor: '#ffffff',
+                onclone: doc => prepararClone(doc, [], { fator: PNG_FONT_FACTOR, paginar: false })
+            });
+            const blob = await new Promise(res => canvas.toBlob(res, 'image/png', 1.0));
+            canvas.width = canvas.height = 0;
+            return blob;
+        }
+
         async function gerarPNG() {
             await comOverlay('Gerando imagem PNG...', async () => {
-                const r = await renderComRetry(3.0);
-                // toBlob evita estourar o limite de data URLs gigantes no celular
-                const blob = await new Promise(res => r.canvas.toBlob(res, 'image/png', 1.0));
-                r.canvas.width = r.canvas.height = 0;
+                let blob = null;
+                try {
+                    blob = await capturarPNGHtmlToImage();
+                } catch (e) {
+                    console.warn('html-to-image falhou, usando plano B:', e);
+                    setOverlayTexto('Usando modo alternativo...');
+                    await proximoFrame();
+                    blob = await capturarPNGHtml2Canvas();
+                }
                 if (!blob) throw new Error('Falha ao criar PNG');
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
